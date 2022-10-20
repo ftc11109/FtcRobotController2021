@@ -55,13 +55,11 @@ import com.qualcomm.robotcore.util.Range;
 public class BasicOpMode_Iterative extends OpMode
 {
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private DcMotor leftDriveF = null;
-    private DcMotor leftDriveB =null;
+    private DcMotor leftDriveB = null;
     private DcMotor rightDriveF = null;
     private DcMotor rightDriveB = null;
-    private Integer mergeconflict2 = 2;
-    private Integer mergeConflict = 1;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -136,7 +134,7 @@ public class BasicOpMode_Iterative extends OpMode
         rightDriveB.setPower(rightPower);
 
         // Show the elapsed game time and wheel power.
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Status", "Run Time: " + runtime);
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
     }
 
