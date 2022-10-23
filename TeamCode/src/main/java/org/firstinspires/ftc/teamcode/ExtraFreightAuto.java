@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+//package org.firstinspires.ftc.teamcode;
 //
 //import android.graphics.Color;
 //import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -43,10 +43,10 @@ package org.firstinspires.ftc.teamcode;
 //  private DcMotor motorArm;
 //  private DcMotor motorIntake;
 //  private DcMotor motorElevator;
-//  private DcMotor left_driveF;
-//  private DcMotor left_driveB;
-//  private DcMotor right_driveF;
-//  private DcMotor right_driveB;
+//  private DcMotor driveLF;
+//  private DcMotor driveLB;
+//  private DcMotor driveRF;
+//  private DcMotor driveRB;
 //
 //  double power;
 //  double targetPositionL;
@@ -63,7 +63,7 @@ package org.firstinspires.ftc.teamcode;
 //  double rotateOut;
 //  boolean parabolicDriving;
 //  ElapsedTime timerIntake;
-//  boolean telemetry2;
+//  boolean telemetryEnabled;
 //  double servoBucketDown;
 //  int carouselLastPosition;
 //  boolean lineDetected;
@@ -127,16 +127,16 @@ package org.firstinspires.ftc.teamcode;
 //    motorArm = hardwareMap.get(DcMotor.class, "motorArm");
 //    motorIntake = hardwareMap.get(DcMotor.class, "motorIntake");
 //    motorElevator = hardwareMap.get(DcMotor.class, "motorElevator");
-//    left_driveF = hardwareMap.get(DcMotor.class, "left_driveF");
-//    left_driveB = hardwareMap.get(DcMotor.class, "left_driveB");
-//    right_driveF = hardwareMap.get(DcMotor.class, "right_driveF");
-//    right_driveB = hardwareMap.get(DcMotor.class, "right_driveB");
+//    driveLF = hardwareMap.get(DcMotor.class, "left_driveF");
+//    driveLB = hardwareMap.get(DcMotor.class, "left_driveB");
+//    driveRF = hardwareMap.get(DcMotor.class, "right_driveF");
+//    driveRB = hardwareMap.get(DcMotor.class, "right_driveB");
 //
 //    teleop = false;
 //    fieldOrientated = teleop;
 //    parabolicDriving = teleop;
 //    // choose red or blue and carousel or warehouse
-//    telemetry2 = false;
+//    telemetryEnabled = false;
 //    servoCap.setDirection(DcMotorSimple.Direction.FORWARD);
 //    servoString.setDirection(Servo.Direction.REVERSE);
 //    stringOut = 1;
@@ -214,14 +214,14 @@ package org.firstinspires.ftc.teamcode;
 //      if (teleop == true) {
 //        while (opModeIsActive()) {
 //          if (gamepad2.right_stick_button && gamepad2.left_stick_button) {
-//            telemetry2 = !telemetry2;
+//            telemetryEnabled = !telemetryEnabled;
 //          }
 //          // Get absolute orientation
 //          angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 //          // Get acceleration due to force of gravity.
 //          gravity = imu.getGravity();
 //          // Display orientation info.
-//          if (telemetry2) {
+//          if (telemetryEnabled) {
 //            telemetry.addData("rot about Z", angles.firstAngle);
 //            telemetry.addData("rot about Y", angles.secondAngle);
 //            telemetry.addData("rot about X", angles.thirdAngle);
@@ -229,7 +229,7 @@ package org.firstinspires.ftc.teamcode;
 //          // Display gravitational acceleration.
 //          // Enter your comment here!
 //          gamepadDriveMotors();
-//          if (telemetry2) {
+//          if (telemetryEnabled) {
 //            hubDistance = sensorDistanceHub.getDistance(DistanceUnit.INCH);
 //            telemetry.addData("sensorHub distance", hubDistance);
 //            telemetry.addData("sensorIntake distance", sensorDistanceIntake.getDistance(DistanceUnit.INCH));
@@ -432,22 +432,22 @@ package org.firstinspires.ftc.teamcode;
 //   * Describe this function...
 //   */
 //  private void runToPositionInitLeftRight(int targetPositionL, int targetPositionR, double powerL, double powerR, int sleep2) {
-//    left_driveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_driveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_driveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_driveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_driveF.setPower(powerL);
-//    right_driveF.setPower(powerR);
-//    left_driveB.setPower(powerL);
-//    right_driveB.setPower(powerR);
-//    left_driveF.setTargetPosition((int) targetPositionL);
-//    right_driveF.setTargetPosition((int) targetPositionR);
-//    left_driveB.setTargetPosition((int) targetPositionL);
-//    right_driveB.setTargetPosition((int) targetPositionR);
-//    left_driveF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    right_driveF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    left_driveB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    right_driveB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveLF.setPower(powerL);
+//    driveRF.setPower(powerR);
+//    driveLB.setPower(powerL);
+//    driveRB.setPower(powerR);
+//    driveLF.setTargetPosition((int) targetPositionL);
+//    driveRF.setTargetPosition((int) targetPositionR);
+//    driveLB.setTargetPosition((int) targetPositionL);
+//    driveRB.setTargetPosition((int) targetPositionR);
+//    driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveRB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //  }
 //
 //  /**
@@ -629,7 +629,7 @@ package org.firstinspires.ftc.teamcode;
 //      // old system, onlyuse if coach places duck
 //      ((DcMotorEx) motorCarousel).setVelocity(0);
 //    }
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      telemetry.addData("carouselPower", carouselDuckVelocity);
 //    }
 //    if (gamepad1.left_bumper) {
@@ -665,7 +665,7 @@ package org.firstinspires.ftc.teamcode;
 //      motorElevator.setTargetPosition(elevatorPos15);
 //      motorElevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //    }
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      telemetry.addData("elevTarget ", elevTarget);
 //      telemetry.addData("elevCurrent", motorElevator.getCurrentPosition());
 //    }
@@ -754,7 +754,7 @@ package org.firstinspires.ftc.teamcode;
 //    }
 //    // left joystick
 //    motorIntake.setPower(intakePower);
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      telemetry.addData("GP1 LeftX", gamepad1.left_stick_y);
 //      telemetry.addData("GP1 LeftY", gamepad1.left_stick_y);
 //      telemetry.addData("GP1 RightX", gamepad1.right_stick_x);
@@ -856,7 +856,7 @@ package org.firstinspires.ftc.teamcode;
 //    double tempForward;
 //    double denominator;
 //
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      telemetry.addData("fwd", fwd);
 //      telemetry.addData("strafe", strafe);
 //    }
@@ -882,23 +882,23 @@ package org.firstinspires.ftc.teamcode;
 //        }
 //      }
 //    }
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      telemetry.addData("field fwd", fwd);
 //      telemetry.addData("field strafe", strafe);
 //    }
-//    left_driveF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//    left_driveB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//    right_driveF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//    right_driveB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//    driveLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//    driveLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//    driveRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//    driveRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //    denominator = max(Math.abs(fwd) + Math.abs(strafe) + Math.abs(rotate), 1.000001);
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      telemetry.addData("denominator", denominator);
 //    }
-//    left_driveF.setPower(adjustForVoltage((fwd + strafe + rotate) / denominator));
-//    left_driveB.setPower(adjustForVoltage(((fwd - strafe) + rotate) / denominator));
-//    right_driveF.setPower(adjustForVoltage(((fwd - strafe) - rotate) / denominator));
-//    right_driveB.setPower(adjustForVoltage(((fwd + strafe) - rotate) / denominator));
-//    if (telemetry2) {
+//    driveLF.setPower(adjustForVoltage((fwd + strafe + rotate) / denominator));
+//    driveLB.setPower(adjustForVoltage(((fwd - strafe) + rotate) / denominator));
+//    driveRF.setPower(adjustForVoltage(((fwd - strafe) - rotate) / denominator));
+//    driveRB.setPower(adjustForVoltage(((fwd + strafe) - rotate) / denominator));
+//    if (telemetryEnabled) {
 //      telemetry.addData("left_driveF", (fwd + strafe + rotate) / denominator);
 //      telemetry.addData("left_driveB", ((fwd - strafe) + rotate) / denominator);
 //      telemetry.addData("right_driveF", ((fwd - strafe) - rotate) / denominator);
@@ -1036,18 +1036,18 @@ package org.firstinspires.ftc.teamcode;
 //    carouselOn = false;
 //    handledThisX = false;
 //    // Initialize Motors.
-//    left_driveF.setDirection(DcMotorSimple.Direction.FORWARD);
-//    left_driveB.setDirection(DcMotorSimple.Direction.FORWARD);
-//    right_driveF.setDirection(DcMotorSimple.Direction.REVERSE);
-//    right_driveB.setDirection(DcMotorSimple.Direction.REVERSE);
-//    left_driveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_driveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_driveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_driveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_driveF.setPower(0.3);
-//    left_driveB.setPower(0.3);
-//    right_driveF.setPower(0.3);
-//    right_driveB.setPower(0.3);
+//    driveLF.setDirection(DcMotorSimple.Direction.FORWARD);
+//    driveLB.setDirection(DcMotorSimple.Direction.FORWARD);
+//    driveRF.setDirection(DcMotorSimple.Direction.REVERSE);
+//    driveRB.setDirection(DcMotorSimple.Direction.REVERSE);
+//    driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveLF.setPower(0.3);
+//    driveLB.setPower(0.3);
+//    driveRF.setPower(0.3);
+//    driveRB.setPower(0.3);
 //    // set the range of the servo
 //    servoBucket.setPosition(servoBucketUp);
 //    if (teleop == false) {
@@ -1478,14 +1478,14 @@ package org.firstinspires.ftc.teamcode;
 //    runToPositionInit(targetPosition, power, sleep2);
 //    while (opModeIsActive()) {
 //      if (freight) {
-//        if (Math.abs(targetPosition - left_driveF.getCurrentPosition()) < 4 * 31.25) {
+//        if (Math.abs(targetPosition - driveLF.getCurrentPosition()) < 4 * 31.25) {
 //          servoBucket.setPosition(servoBucketDown);
 //        }
 //      }
-//      if (Math.abs(targetPosition - left_driveF.getCurrentPosition()) < tolerance && Math.abs(targetPosition - right_driveF.getCurrentPosition()) < tolerance && Math.abs(targetPosition - left_driveB.getCurrentPosition()) < tolerance && Math.abs(targetPosition - right_driveB.getCurrentPosition()) < tolerance) {
+//      if (Math.abs(targetPosition - driveLF.getCurrentPosition()) < tolerance && Math.abs(targetPosition - driveRF.getCurrentPosition()) < tolerance && Math.abs(targetPosition - driveLB.getCurrentPosition()) < tolerance && Math.abs(targetPosition - driveRB.getCurrentPosition()) < tolerance) {
 //        break;
 //      }
-//      if (left_driveF.isBusy() || left_driveB.isBusy() || right_driveF.isBusy() || right_driveB.isBusy()) {
+//      if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
 //        continue;
 //      }
 //      break;
@@ -1497,22 +1497,22 @@ package org.firstinspires.ftc.teamcode;
 //   * Describe this function...
 //   */
 //  private void runToPositionInit(int targetPosition, double power, int sleep2) {
-//    left_driveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_driveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_driveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_driveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_driveF.setPower(power);
-//    left_driveB.setPower(power);
-//    right_driveF.setPower(power);
-//    right_driveB.setPower(power);
-//    left_driveF.setTargetPosition(targetPosition);
-//    left_driveB.setTargetPosition(targetPosition);
-//    right_driveF.setTargetPosition(targetPosition);
-//    right_driveB.setTargetPosition(targetPosition);
-//    left_driveF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    left_driveB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    right_driveF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    right_driveB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveLF.setPower(power);
+//    driveLB.setPower(power);
+//    driveRF.setPower(power);
+//    driveRB.setPower(power);
+//    driveLF.setTargetPosition(targetPosition);
+//    driveLB.setTargetPosition(targetPosition);
+//    driveRF.setTargetPosition(targetPosition);
+//    driveRB.setTargetPosition(targetPosition);
+//    driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveRB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //  }
 //
 //  /**
@@ -1522,26 +1522,26 @@ package org.firstinspires.ftc.teamcode;
 //    runToPositionInit((int) targetInches, power, sleep2);
 //    while (opModeIsActive()) {
 //      hubDistance = sensorDistanceHub.getDistance(DistanceUnit.INCH);
-//      if (telemetry2) {
+//      if (telemetryEnabled) {
 //        telemetry.addData("hub sensor distance", hubDistance);
 //      }
 //      if (hubDistance > 5 && hubDistance < 20) {
-//        if (telemetry2) {
+//        if (telemetryEnabled) {
 //          telemetry.addData("runToPositionDistance", 123);
 //        }
-//        targetPosition = (int) ((left_driveF.getCurrentPosition() + right_driveF.getCurrentPosition()) / 2 - (hubDistance - 10) * 31.25);
-//        left_driveF.setTargetPosition(targetPosition);
-//        left_driveB.setTargetPosition(targetPosition);
-//        right_driveF.setTargetPosition(targetPosition);
-//        right_driveB.setTargetPosition(targetPosition);
-//        left_driveF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        left_driveB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        right_driveF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        right_driveB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        targetPosition = (int) ((driveLF.getCurrentPosition() + driveRF.getCurrentPosition()) / 2 - (hubDistance - 10) * 31.25);
+//        driveLF.setTargetPosition(targetPosition);
+//        driveLB.setTargetPosition(targetPosition);
+//        driveRF.setTargetPosition(targetPosition);
+//        driveRB.setTargetPosition(targetPosition);
+//        driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        driveRB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //      }
 //      runToPositionLoop(targetPosition / 31.25, power, sleep2);
 //      telemetry.update();
-//      if (left_driveF.isBusy() || left_driveB.isBusy() || right_driveF.isBusy() || right_driveB.isBusy()) {
+//      if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
 //        continue;
 //      }
 //      break;
@@ -1553,22 +1553,22 @@ package org.firstinspires.ftc.teamcode;
 //   * Describe this function...
 //   */
 //  private void runToPositionLoop(double targetInches, double power, int sleep2) {
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      // set how close to the target position the robot stops at
 //      // set last position to current position
 //      // current position to the current position
-//      currentPositionLF = left_driveF.getCurrentPosition();
-//      currentPositionLB = left_driveB.getCurrentPosition();
-//      currentPositionRF = right_driveF.getCurrentPosition();
-//      currentPositionRB = right_driveB.getCurrentPosition();
+//      currentPositionLF = driveLF.getCurrentPosition();
+//      currentPositionLB = driveLB.getCurrentPosition();
+//      currentPositionRF = driveRF.getCurrentPosition();
+//      currentPositionRB = driveRB.getCurrentPosition();
 //      telemetry.addData("currentPositionLF", currentPositionLF);
 //      telemetry.addData("currentPositionLB", currentPositionLB);
 //      telemetry.addData("currentPositionRF", currentPositionRF);
 //      telemetry.addData("currentPositionRB", currentPositionRB);
-//      telemetry.addData("isBusyLF", left_driveF.isBusy());
-//      telemetry.addData("isBusyLB", left_driveB.isBusy());
-//      telemetry.addData("isBusyRF", right_driveF.isBusy());
-//      telemetry.addData("isBusyRB", right_driveB.isBusy());
+//      telemetry.addData("isBusyLF", driveLF.isBusy());
+//      telemetry.addData("isBusyLB", driveLB.isBusy());
+//      telemetry.addData("isBusyRF", driveRF.isBusy());
+//      telemetry.addData("isBusyRB", driveRB.isBusy());
 //    }
 //  }
 //
@@ -1577,42 +1577,42 @@ package org.firstinspires.ftc.teamcode;
 //   */
 //  private void runToPositionOld(double targetInches, double power, long sleep2) {
 //    targetPosition = (int) (targetInches * 31.25);
-//    left_driveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_driveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_driveF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_driveB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_driveF.setPower(power);
-//    left_driveB.setPower(power);
-//    right_driveF.setPower(power);
-//    right_driveB.setPower(power);
-//    left_driveF.setTargetPosition(targetPosition);
-//    left_driveB.setTargetPosition(targetPosition);
-//    right_driveF.setTargetPosition(targetPosition);
-//    right_driveB.setTargetPosition(targetPosition);
-//    left_driveF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    left_driveB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    right_driveF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    right_driveB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    driveLF.setPower(power);
+//    driveLB.setPower(power);
+//    driveRF.setPower(power);
+//    driveRB.setPower(power);
+//    driveLF.setTargetPosition(targetPosition);
+//    driveLB.setTargetPosition(targetPosition);
+//    driveRF.setTargetPosition(targetPosition);
+//    driveRB.setTargetPosition(targetPosition);
+//    driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//    driveRB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //    // set how close to the target position the robot stops at
 //    while (opModeIsActive()) {
 //      // set last position to current position
 //      // current position to the current position
-//      currentPositionLF = left_driveF.getCurrentPosition();
-//      currentPositionLB = left_driveB.getCurrentPosition();
-//      currentPositionRF = right_driveF.getCurrentPosition();
-//      currentPositionRB = right_driveB.getCurrentPosition();
-//      if (telemetry2) {
+//      currentPositionLF = driveLF.getCurrentPosition();
+//      currentPositionLB = driveLB.getCurrentPosition();
+//      currentPositionRF = driveRF.getCurrentPosition();
+//      currentPositionRB = driveRB.getCurrentPosition();
+//      if (telemetryEnabled) {
 //        telemetry.addData("currentPositionLF", currentPositionLF);
 //        telemetry.addData("currentPositionLB", currentPositionLB);
 //        telemetry.addData("currentPositionRF", currentPositionRF);
 //        telemetry.addData("currentPositionRB", currentPositionRB);
-//        telemetry.addData("isBusyLF", left_driveF.isBusy());
-//        telemetry.addData("isBusyLB", left_driveB.isBusy());
-//        telemetry.addData("isBusyRF", right_driveF.isBusy());
-//        telemetry.addData("isBusyRB", right_driveB.isBusy());
+//        telemetry.addData("isBusyLF", driveLF.isBusy());
+//        telemetry.addData("isBusyLB", driveLB.isBusy());
+//        telemetry.addData("isBusyRF", driveRF.isBusy());
+//        telemetry.addData("isBusyRB", driveRB.isBusy());
 //        telemetry.update();
 //      }
-//      if (left_driveF.isBusy() || left_driveB.isBusy() || right_driveF.isBusy() || right_driveB.isBusy()) {
+//      if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
 //        continue;
 //      }
 //      break;
@@ -1627,7 +1627,7 @@ package org.firstinspires.ftc.teamcode;
 //    carouselSpeed = 1000000000 * ((motorCarousel.getCurrentPosition() - carouselLastPosition) / (System.nanoTime() - carouselLastTime));
 //    carouselLastPosition = motorCarousel.getCurrentPosition();
 //    carouselLastTime = System.nanoTime();
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      telemetry.addData("carouselSpeed", carouselSpeed);
 //    }
 //    return carouselSpeed;
@@ -1644,7 +1644,7 @@ package org.firstinspires.ftc.teamcode;
 //    if (angleDifference < -180) {
 //      angleDifference += 360;
 //    }
-//    if (telemetry2) {
+//    if (telemetryEnabled) {
 //      telemetry.addData("angleDifference", angleDifference);
 //      telemetry.addData("currentAngle", currentAngle);
 //    }
@@ -1672,22 +1672,22 @@ package org.firstinspires.ftc.teamcode;
 //    targetPositionL = targetInchesL * 31.25;
 //    targetPositionR = targetInchesR * 31.25;
 //    tolerance = tolerance * 31.25;
-//    ((DcMotorEx) left_driveF).setTargetPositionTolerance(tolerance);
-//    ((DcMotorEx) right_driveF).setTargetPositionTolerance(tolerance);
-//    ((DcMotorEx) left_driveB).setTargetPositionTolerance(tolerance);
-//    ((DcMotorEx) right_driveB).setTargetPositionTolerance(tolerance);
+//    ((DcMotorEx) driveLF).setTargetPositionTolerance(tolerance);
+//    ((DcMotorEx) driveRF).setTargetPositionTolerance(tolerance);
+//    ((DcMotorEx) driveLB).setTargetPositionTolerance(tolerance);
+//    ((DcMotorEx) driveRB).setTargetPositionTolerance(tolerance);
 //    runToPositionInitLeftRight((int) targetPositionL, (int) targetPositionR, powerL, powerR, sleep2);
 //    while (opModeIsActive()) {
-//      positionLF = left_driveF.getCurrentPosition();
-//      positionRF = right_driveF.getCurrentPosition();
-//      positionLB = left_driveB.getCurrentPosition();
-//      positionRB = right_driveB.getCurrentPosition();
+//      positionLF = driveLF.getCurrentPosition();
+//      positionRF = driveRF.getCurrentPosition();
+//      positionLB = driveLB.getCurrentPosition();
+//      positionRB = driveRB.getCurrentPosition();
 //      if (freight) {
 //        if (Math.abs(targetPositionL - positionLF) < 4 * 31.25 && Math.abs(targetPositionR - positionRF) < 4 * 31.25) {
 //          servoBucket.setPosition(servoBucketDown);
 //        }
 //      }
-//      if (left_driveF.isBusy() || left_driveB.isBusy() || right_driveF.isBusy() || right_driveB.isBusy()) {
+//      if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
 //        continue;
 //      }
 //      break;
@@ -1722,7 +1722,7 @@ package org.firstinspires.ftc.teamcode;
 //      if (angleDifference < -180) {
 //        angleDifference += 360;
 //      }
-//      if (telemetry2) {
+//      if (telemetryEnabled) {
 //        telemetry.addData("angleDifference", angleDifference);
 //        telemetry.addData("currentAngle", currentAngle);
 //      }
@@ -1762,22 +1762,22 @@ package org.firstinspires.ftc.teamcode;
 //    targetPositionL = targetInchesL * 31.25;
 //    targetPositionR = targetInchesR * 31.25;
 //    tolerance = tolerance * 31.25;
-//    ((DcMotorEx) left_driveF).setTargetPositionTolerance((int) tolerance);
-//    ((DcMotorEx) right_driveF).setTargetPositionTolerance((int) tolerance);
-//    ((DcMotorEx) left_driveB).setTargetPositionTolerance((int) tolerance);
-//    ((DcMotorEx) right_driveB).setTargetPositionTolerance((int) tolerance);
+//    ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
+//    ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
+//    ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
+//    ((DcMotorEx) driveRB).setTargetPositionTolerance((int) tolerance);
 //    runToPositionInitLeftRight((int) targetPositionL, (int) targetPositionR, powerL, powerR, sleep2);
 //    while (opModeIsActive()) {
-//      positionLF = left_driveF.getCurrentPosition();
-//      positionRF = right_driveF.getCurrentPosition();
-//      positionLB = left_driveB.getCurrentPosition();
-//      positionRB = right_driveB.getCurrentPosition();
+//      positionLF = driveLF.getCurrentPosition();
+//      positionRF = driveRF.getCurrentPosition();
+//      positionLB = driveLB.getCurrentPosition();
+//      positionRB = driveRB.getCurrentPosition();
 //      if (freight) {
 //        if (Math.abs(targetPositionL - positionLF) < 4 * 31.25 && Math.abs(targetPositionR - positionRF) < 4 * 31.25) {
 //          servoBucket.setPosition(servoBucketDown);
 //        }
 //      }
-//      if (left_driveF.isBusy() || left_driveB.isBusy() || right_driveF.isBusy() || right_driveB.isBusy()) {
+//      if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
 //        continue;
 //      }
 //      break;
