@@ -259,12 +259,12 @@ public class DetectSignalSleeveSide extends LinearOpMode
             }
         }
     }
-    public static class SkystoneDeterminationPipeline extends OpenCvPipeline
+    public static class PowerPlayDeterminationPipeline extends OpenCvPipeline
     {
         /*
-         * An enum to define the skystone position
+         * An enum to define the PowerPlay position
          */
-        public enum SkystonePosition
+        public enum ParkingPosition
         {
             LEFT,
             CENTER,
@@ -320,7 +320,7 @@ public class DetectSignalSleeveSide extends LinearOpMode
         int avgR, avgG, avgB;
 
         // Volatile since accessed by OpMode thread w/o synchronization
-        private volatile SkystonePosition position = SkystonePosition.LEFT;
+        private volatile ParkingPosition position = ParkingPosition.LEFT;
 
         /*
          * This function takes the RGB frame, converts to YCrCb,
@@ -377,17 +377,17 @@ public class DetectSignalSleeveSide extends LinearOpMode
              *
              * After we've converted to YCrCb, we extract just the 2nd channel, the
              * Cb channel. We do this because stones are bright yellow and contrast
-             * STRONGLY on the Cb channel against everything else, including SkyStones
-             * (because SkyStones have a black label).
+             * STRONGLY on the Cb channel against everything else, including PowerPlays
+             * (because PowerPlays have a black label).
              *
              * We then take the average pixel value of 3 different regions on that Cb
              * channel, one positioned over each stone. The brightest of the 3 regions
-             * is where we assume the SkyStone to be, since the normal stones show up
+             * is where we assume the PowerPlay to be, since the normal stones show up
              * extremely darkly.
              *
              * We also draw rectangles on the screen showing where the sample regions
              * are, as well as drawing a solid rectangle over top the sample region
-             * we believe is on top of the SkyStone.
+             * we believe is on top of the PowerPlay.
              *
              * In order for this whole process to work correctly, each sample region
              * should be positioned in the center of each of the first 3 stones, and
@@ -436,7 +436,7 @@ public class DetectSignalSleeveSide extends LinearOpMode
              */
             if(max == avgR) // Was it from region 1?
             {
-                position = SkystonePosition.LEFT; // Record our analysis
+                position = ParkingPosition.LEFT; // Record our analysis
 
                 /*
                  * Draw a solid rectangle on top of the chosen region.
@@ -451,7 +451,7 @@ public class DetectSignalSleeveSide extends LinearOpMode
             }
             else if(max == avgG) // Was it from region 2?
             {
-                position = SkystonePosition.CENTER; // Record our analysis
+                position = ParkingPosition.CENTER; // Record our analysis
 
                 /*
                  * Draw a solid rectangle on top of the chosen region.
@@ -466,7 +466,7 @@ public class DetectSignalSleeveSide extends LinearOpMode
             }
             else if(max == avgB) // Was it from region 3?
             {
-                position = SkystonePosition.RIGHT; // Record our analysis
+                position = ParkingPosition.RIGHT; // Record our analysis
 
                 /*
                  * Draw a solid rectangle on top of the chosen region.
@@ -491,7 +491,7 @@ public class DetectSignalSleeveSide extends LinearOpMode
         /*
          * Call this from the OpMode thread to obtain the latest analysis
          */
-        public SkystonePosition getAnalysis()
+        public ParkingPosition getParkingPosition()
         {
             return position;
         }
