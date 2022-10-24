@@ -105,6 +105,9 @@ public class FTC11109Code extends LinearOpMode {
     String startColor;
     String startAorJ;
 
+    DetectSignalSleeveSide detectSignalSleeveSide;
+    DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition parkingPosition;
+
     @Override
     public void runOpMode() {
         myInit();
@@ -174,6 +177,8 @@ public class FTC11109Code extends LinearOpMode {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         initialAngle = angles.firstAngle;
 
+        detectSignalSleeveSide.init(hardwareMap);
+
 
     }
 
@@ -193,9 +198,12 @@ public class FTC11109Code extends LinearOpMode {
         } else if (gamepad1.a) {
             startAorJ = "audience";
         }
+        parkingPosition = detectSignalSleeveSide.getParkingPosition();
 
         telemetry.addData("startColor", startColor);
         telemetry.addData("startAudienceOrWarehouse", startAorJ);
+        telemetry.addData("parkingPosition", parkingPosition);
+
 
     }
 
@@ -204,6 +212,8 @@ public class FTC11109Code extends LinearOpMode {
      */
     public void myStart() {
         runtime.reset();
+        parkingPosition = detectSignalSleeveSide.start();
+
     }
 
     /*
@@ -217,6 +227,7 @@ public class FTC11109Code extends LinearOpMode {
             telemetry.addData("rot about Z", angles.firstAngle);
             telemetry.addData("rot about Y", angles.secondAngle);
             telemetry.addData("rot about X", angles.thirdAngle);
+
         }
 
         gamepadDriveMotors();
