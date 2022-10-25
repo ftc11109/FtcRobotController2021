@@ -79,5 +79,10 @@ import org.firstinspires.ftc.robotcore.external.tfod.Tfod;
 @TeleOp(name="FTC11109Teleop", group="Iterative Opmode")
 // @Disabled
 public class FTC11109Teleop extends FTC11109Code {
+    @Override
+    public void runOpMode() {
+        setTeleop(true);
+        super.runOpMode();
+    }
 
 }

@@ -108,6 +108,10 @@ public class FTC11109Code extends LinearOpMode {
     DetectSignalSleeveSide detectSignalSleeveSide;
     DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition parkingPosition;
 
+    public void setTeleop(boolean newTeleop) {
+        teleop = newTeleop;
+    }
+
     @Override
     public void runOpMode() {
         myInit();
@@ -117,7 +121,6 @@ public class FTC11109Code extends LinearOpMode {
         myStart();
         while (opModeIsActive()) {
             myLoop();
-            loop();
         }
         myStop();
     }
@@ -127,7 +130,6 @@ public class FTC11109Code extends LinearOpMode {
      * Code to run ONCE when the driver hits INIT
      */
     public void myInit() {
-        teleop = true; //move to the extended opmodes when we figure out how
         fieldOrientated = true;
         parabolicDriving = teleop;
 
@@ -200,6 +202,9 @@ public class FTC11109Code extends LinearOpMode {
             startAorJ = "audience";
         }
         parkingPosition = detectSignalSleeveSide.getParkingPosition();
+
+
+        telemetry.addData("teleop", teleop);
 
         telemetry.addData("startColor", startColor);
         telemetry.addData("startAudienceOrWarehouse", startAorJ);
