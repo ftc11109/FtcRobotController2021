@@ -100,7 +100,6 @@ public class FTC11109Code extends LinearOpMode {
     Orientation angles;
     BNO055IMU.Parameters imuParameters;
     private BNO055IMU imu;
-    double initialAngle;
 
     String startColor;
     String startAorJ;
@@ -116,10 +115,24 @@ public class FTC11109Code extends LinearOpMode {
     public void runOpMode() {
         myInit();
         while (!opModeIsActive()) {
+            if (isStopRequested()) {
+                myStop();
+                return;
+            }
             myInitLoop();
         }
+
+        if (isStopRequested()) {
+            myStop();
+            return;
+        }
         myStart();
+
         while (opModeIsActive()) {
+            if (isStopRequested()) {
+                myStop();
+                return;
+            }
             myLoop();
         }
         myStop();
@@ -172,15 +185,18 @@ public class FTC11109Code extends LinearOpMode {
         // Disable logging.
         imuParameters.loggingEnabled = false;
 
+
         // Initialize IMU.
         imu.initialize(imuParameters);
 
         // Get absolute orientation
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        initialAngle = angles.firstAngle;
 
-        detectSignalSleeveSide = new DetectSignalSleeveSide();
-        detectSignalSleeveSide.init(hardwareMap);
+        if (!teleop) {
+
+            detectSignalSleeveSide = new DetectSignalSleeveSide();
+            detectSignalSleeveSide.init(hardwareMap);
+        }
 
 
     }
@@ -201,8 +217,13 @@ public class FTC11109Code extends LinearOpMode {
         } else if (gamepad1.a) {
             startAorJ = "audience";
         }
-        parkingPosition = detectSignalSleeveSide.getParkingPosition();
 
+
+
+
+        if (!teleop) {
+            parkingPosition = detectSignalSleeveSide.getParkingPosition();
+        }
 
         telemetry.addData("teleop", teleop);
 
@@ -210,10 +231,11 @@ public class FTC11109Code extends LinearOpMode {
         telemetry.addData("startAudienceOrWarehouse", startAorJ);
         telemetry.addData("parkingPosition", parkingPosition);
 
-        telemetry.addData("average red", detectSignalSleeveSide.getAverageRed());
-        telemetry.addData("average green", detectSignalSleeveSide.getAverageGreen());
-        telemetry.addData("average blue", detectSignalSleeveSide.getAverageBlue());
-
+        if (detectSignalSleeveSide != null) {
+            telemetry.addData("average red", detectSignalSleeveSide.getAverageRed());
+            telemetry.addData("average green", detectSignalSleeveSide.getAverageGreen());
+            telemetry.addData("average blue", detectSignalSleeveSide.getAverageBlue());
+        }
         telemetry.update(); //sends telemetry to the driver controller. all telemetry must come BEFORE this line.
 
 
@@ -224,8 +246,9 @@ public class FTC11109Code extends LinearOpMode {
      */
     public void myStart() {
         runtime.reset();
-        parkingPosition = detectSignalSleeveSide.start();
-
+        if (detectSignalSleeveSide != null) {
+            parkingPosition = detectSignalSleeveSide.start();
+        }
     }
 
     /*
@@ -564,11 +587,9 @@ public class FTC11109Code extends LinearOpMode {
 
     private void turn(int targetAngle, double powerIn, double powerIn2, int tolerance, int targetReachedCountThreshold, int failSafeCountThreshold) {
         double rotate;
-        int failSafeCount;
-        int targetReachedCount;
 
-        failSafeCount = 0;
-        targetReachedCount = 0;
+        int failSafeCount = 0;
+        int targetReachedCount = 0;
         while (opModeIsActive()) {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             double currentAngle = angles.firstAngle;
