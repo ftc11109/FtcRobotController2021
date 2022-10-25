@@ -177,6 +177,7 @@ public class FTC11109Code extends LinearOpMode {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         initialAngle = angles.firstAngle;
 
+        detectSignalSleeveSide = new DetectSignalSleeveSide();
         detectSignalSleeveSide.init(hardwareMap);
 
 
@@ -203,6 +204,12 @@ public class FTC11109Code extends LinearOpMode {
         telemetry.addData("startColor", startColor);
         telemetry.addData("startAudienceOrWarehouse", startAorJ);
         telemetry.addData("parkingPosition", parkingPosition);
+
+        telemetry.addData("average red", detectSignalSleeveSide.getAverageRed());
+        telemetry.addData("average green", detectSignalSleeveSide.getAverageGreen());
+        telemetry.addData("average blue", detectSignalSleeveSide.getAverageBlue());
+
+        telemetry.update(); //sends telemetry to the driver controller. all telemetry must come BEFORE this line.
 
 
     }
@@ -418,6 +425,40 @@ public class FTC11109Code extends LinearOpMode {
         driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveRB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    private void strafeToPosition(double targetInches, double power, int sleepTime, double tolerance) {
+        int targetPosition = (int) (targetInches * 31.25);
+        tolerance = tolerance * 31.25;
+        ((DcMotorEx) driveLF).setTargetPositionTolerance((int)tolerance);
+        ((DcMotorEx) driveRF).setTargetPositionTolerance((int)tolerance);
+        ((DcMotorEx) driveLB).setTargetPositionTolerance((int)tolerance);
+        ((DcMotorEx) driveRB).setTargetPositionTolerance((int)tolerance);
+        driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLF.setPower(power);
+        driveRF.setPower(power);
+        driveLB.setPower(power);
+        driveRB.setPower(power);
+        driveLF.setTargetPosition((int) targetPosition);
+        driveRF.setTargetPosition((int) -targetPosition);
+        driveLB.setTargetPosition((int) -targetPosition);
+        driveRB.setTargetPosition((int) targetPosition);
+        driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveRB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while (opModeIsActive()) {
+
+            if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
+                continue;
+            }
+            break;
+        }
+        sleep(sleepTime);
     }
 
     private void driveTelemetryRunToPosition() {

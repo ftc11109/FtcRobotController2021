@@ -121,6 +121,18 @@ public class DetectSignalSleeveSide
         return pipeline.getParkingPosition();
     }
 
+    public int getAverageRed() {
+        return pipeline.getAverageRed();
+    }
+
+    public int getAverageGreen() {
+        return pipeline.getAverageGreen();
+    }
+
+    public int getAverageBlue() {
+        return pipeline.getAverageBlue();
+    }
+
 
 
     public static class PowerPlayDeterminationPipeline extends OpenCvPipeline
@@ -130,6 +142,7 @@ public class DetectSignalSleeveSide
          */
         public enum ParkingPosition
         {
+            DETECTING,
             LEFT,
             CENTER,
             RIGHT
@@ -177,14 +190,15 @@ public class DetectSignalSleeveSide
         /*
          * Working variables
          */
+
         Mat region_red, region_green, region_blue;
         Mat Cr = new Mat();
         Mat Cg = new Mat();
         Mat Cb = new Mat();
-        int avgR, avgG, avgB;
+        private volatile int avgR, avgG, avgB;
 
         // Volatile since accessed by OpMode thread w/o synchronization
-        private volatile ParkingPosition position = ParkingPosition.LEFT;
+        private volatile ParkingPosition position = ParkingPosition.DETECTING;
 
         /*
          * This function takes the RGB frame, converts to YCrCb,
@@ -359,5 +373,9 @@ public class DetectSignalSleeveSide
         {
             return position;
         }
+
+        public int getAverageRed() {return avgR; }
+        public int getAverageGreen() {return avgG; }
+        public int getAverageBlue() {return avgB; }
     }
 }
