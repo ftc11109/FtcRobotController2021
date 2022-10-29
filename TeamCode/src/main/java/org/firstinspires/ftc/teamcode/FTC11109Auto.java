@@ -82,6 +82,7 @@ public class FTC11109Auto extends FTC11109Code {
     @Override
     public void runOpMode() {
         setTeleop(false);
+        setInitIMU(true);
         super.runOpMode();
     }
 

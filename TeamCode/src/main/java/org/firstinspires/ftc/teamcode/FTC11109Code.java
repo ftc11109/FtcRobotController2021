@@ -52,6 +52,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -92,6 +94,7 @@ public class FTC11109Code extends LinearOpMode {
     private DcMotor driveRB = null;
 
     boolean teleop;
+    boolean initIMU;
     boolean fieldOrientated;
     boolean parabolicDriving;
 
@@ -101,6 +104,9 @@ public class FTC11109Code extends LinearOpMode {
     BNO055IMU.Parameters imuParameters;
     private BNO055IMU imu;
 
+    final double headingOffset = 0.0;
+    final double P_DRIVE_GAIN = 0.03;
+
     String startColor;
     String startAorJ;
 
@@ -109,6 +115,10 @@ public class FTC11109Code extends LinearOpMode {
 
     public void setTeleop(boolean newTeleop) {
         teleop = newTeleop;
+    }
+
+    public void setInitIMU(boolean newInitIMU) {
+        initIMU = newInitIMU;
     }
 
     @Override
@@ -185,9 +195,10 @@ public class FTC11109Code extends LinearOpMode {
         // Disable logging.
         imuParameters.loggingEnabled = false;
 
-
-        // Initialize IMU.
-        imu.initialize(imuParameters);
+        if (initIMU) {
+            // Initialize IMU.
+            imu.initialize(imuParameters);
+        }
 
         // Get absolute orientation
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -523,6 +534,77 @@ public class FTC11109Code extends LinearOpMode {
         }
         sleep(sleepTime);
     }
+
+
+
+
+    private void strafeToPositionIMU(double targetInches, double power, int sleepTime, double tolerance, double targetHeading) {
+        int targetPosition = (int) (targetInches * 32.5);
+        tolerance = tolerance * 32.5;
+        ((DcMotorEx) driveLF).setTargetPositionTolerance((int)tolerance);
+        ((DcMotorEx) driveRF).setTargetPositionTolerance((int)tolerance);
+        ((DcMotorEx) driveLB).setTargetPositionTolerance((int)tolerance);
+        ((DcMotorEx) driveRB).setTargetPositionTolerance((int)tolerance);
+        driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLF.setPower(power);
+        driveRF.setPower(power);
+        driveLB.setPower(power);
+        driveRB.setPower(power);
+        driveLF.setTargetPosition((int) targetPosition);
+        driveRF.setTargetPosition((int) -targetPosition);
+        driveLB.setTargetPosition((int) -targetPosition);
+        driveRB.setTargetPosition((int) targetPosition);
+        driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        driveRB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+        while (opModeIsActive()) {
+            if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
+                // Determine required steering to keep on heading
+                double turnPower = getSteeringCorrection(targetHeading, P_DRIVE_GAIN);
+
+                // if driving in reverse, the motor correction also needs to be reversed
+                if (targetPosition < 0)
+                    turnPower *= -1.0;
+
+                driveLF.setPower(power);
+                driveRF.setPower(power);
+                driveLB.setPower(power);
+                driveRB.setPower(power);
+
+                continue;
+            }
+            break;
+        }
+        sleep(sleepTime);
+    }
+
+    public double getSteeringCorrection(double targetHeading, double proportionalGain) {
+        // Get the robot heading by applying an offset to the IMU heading
+        double robotHeading = getRawHeading() - headingOffset;
+
+        // Determine the heading current error
+        double headingError = targetHeading - robotHeading;
+
+        // Normalize the error to be within +/- 180 degrees
+        while (headingError > 180)  headingError -= 360;
+        while (headingError <= -180) headingError += 360;
+
+        // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
+        return Range.clip(headingError * proportionalGain, -1, 1);
+    }
+
+    public double getRawHeading() {
+        Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return angles.firstAngle;
+    }
+
+
 
     private void driveTelemetryRunToPosition() {
         // set how close to the target position the robot stops at
