@@ -249,6 +249,40 @@ public class FTC11109Code extends LinearOpMode {
         if (detectSignalSleeveSide != null) {
             parkingPosition = detectSignalSleeveSide.start();
         }
+
+        if(!teleop) {
+            int sleepTime = 1000;
+            double tolerance = 1;
+            double turnTolerance = .5;
+            int failSafeCountThreshold = 4;
+            double power = .3;
+            double powerin2 = .15;
+            strafeToPosition(24, .3, sleepTime, tolerance);
+            turn(0, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+            runToPosition(40, .3, sleepTime, tolerance);
+            turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+            sleep(2000);
+            strafeToPosition(-12, .3, sleepTime, tolerance);
+            turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+            runToPosition(-48, .3, sleepTime, tolerance);
+            turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+            if (false) {
+                runToPosition(48, .3, sleepTime, tolerance);
+                turn(-135, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+
+                turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+                sleep(2000);
+                runToPosition(-48, .3, sleepTime, tolerance);
+
+            } else {
+                runToPositionLeftRight(58,44,.3,.3,sleepTime,tolerance);
+                runToPositionLeftRight(-14,0,.3,.3,sleepTime,tolerance);
+                turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+                runToPositionLeftRight(-44,-44,.3,.3,sleepTime,tolerance);
+            }
+            sleep(2000);
+
+        }
     }
 
     /*
@@ -271,6 +305,7 @@ public class FTC11109Code extends LinearOpMode {
             // updateDriverStation
             telemetry.update();
         }
+
 
     }
 
@@ -456,8 +491,8 @@ public class FTC11109Code extends LinearOpMode {
     }
 
     private void strafeToPosition(double targetInches, double power, int sleepTime, double tolerance) {
-        int targetPosition = (int) (targetInches * 31.25);
-        tolerance = tolerance * 31.25;
+        int targetPosition = (int) (targetInches * 32.5);
+        tolerance = tolerance * 32.5;
         ((DcMotorEx) driveLF).setTargetPositionTolerance((int)tolerance);
         ((DcMotorEx) driveRF).setTargetPositionTolerance((int)tolerance);
         ((DcMotorEx) driveLB).setTargetPositionTolerance((int)tolerance);
@@ -585,7 +620,7 @@ public class FTC11109Code extends LinearOpMode {
     }
 
 
-    private void turn(int targetAngle, double powerIn, double powerIn2, int tolerance, int targetReachedCountThreshold, int failSafeCountThreshold) {
+    private void turn(int targetAngle, double powerIn, double powerIn2, double tolerance, int targetReachedCountThreshold, int failSafeCountThreshold) {
         double rotate;
 
         int failSafeCount = 0;
