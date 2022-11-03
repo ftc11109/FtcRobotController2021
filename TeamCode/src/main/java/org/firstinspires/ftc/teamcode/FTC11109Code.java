@@ -41,6 +41,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -55,6 +56,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import java.util.List;
+
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -74,10 +76,10 @@ import org.firstinspires.ftc.robotcore.external.tfod.Tfod;
  * The names of OpModes appear on the menu of the FTC Driver Station.
  * When a selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all iterative OpModes contain.
- *
+ * <p>
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
@@ -127,6 +129,10 @@ public class FTC11109Code extends LinearOpMode {
 
     final int slideDeliverHigh = 400;
     final int armDeliverHigh = 401;
+
+    final double intakePowerDeliver = -1.0;
+    final double intakePowerPickup = 1.0;
+    final double intakePowerHold = 0.0;
 
     int slideTarget;
     int armTarget;
@@ -262,8 +268,6 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
-
-
         if (!teleop) {
             parkingPosition = detectSignalSleeveSide.getParkingPosition();
         }
@@ -293,7 +297,7 @@ public class FTC11109Code extends LinearOpMode {
             parkingPosition = detectSignalSleeveSide.start();
         }
 
-        if(!teleop) {
+        if (!teleop) {
             int sleepTime = 500;
             double tolerance = 1;
             double turnTolerance = .5;
@@ -304,26 +308,42 @@ public class FTC11109Code extends LinearOpMode {
             turn(0, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
             runToPosition(40, .3, sleepTime, tolerance);
             turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+            //deliver cone
             sleep(800);
             strafeToPosition(-12, .3, sleepTime, tolerance);
             turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
             runToPosition(-48, .3, sleepTime, tolerance);
             turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
-            if (false) {
-                runToPosition(48, .3, sleepTime, tolerance);
-                turn(-135, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+            //pickup cone
 
-                turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
-                sleep(2000);
-                runToPosition(-48, .3, sleepTime, tolerance);
+            runToPositionLeftRight(58, 44, .3, .3, sleepTime, tolerance);
+            //deliver cone
 
-            } else {
-                runToPositionLeftRight(58,44,.3,.3,sleepTime,tolerance);
-                runToPositionLeftRight(-14,0,.3,.3,sleepTime,tolerance);
-                turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
-                runToPositionLeftRight(-44,-44,.3,.3,sleepTime,tolerance);
+            // if we didn't detect a parking spot, pick a good default
+            if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING){
+                parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT;
             }
-            sleep(800);
+            // actually park!
+            if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+                runToPositionLeftRight(-14, 0, .3, .3, sleepTime, tolerance);
+                turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+                runToPositionLeftRight(-44, -44, .3, .3, sleepTime, tolerance);
+                //pickup cone
+
+            }
+            else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+                runToPositionLeftRight(-14, 0, .3, .3, sleepTime, tolerance);
+                turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+                runToPositionLeftRight(-20, -20, .3, .3, sleepTime, tolerance);
+                turn(-180, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+
+            }
+            else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT){
+                runToPositionLeftRight(-14, 0, .3, .3, sleepTime, tolerance);
+                turn(-180, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
+            }
+
+
 
         }
     }
@@ -537,10 +557,10 @@ public class FTC11109Code extends LinearOpMode {
     private void strafeToPosition(double targetInches, double power, int sleepTime, double tolerance) {
         int targetPosition = (int) (targetInches * 32.5);
         tolerance = tolerance * 32.5;
-        ((DcMotorEx) driveLF).setTargetPositionTolerance((int)tolerance);
-        ((DcMotorEx) driveRF).setTargetPositionTolerance((int)tolerance);
-        ((DcMotorEx) driveLB).setTargetPositionTolerance((int)tolerance);
-        ((DcMotorEx) driveRB).setTargetPositionTolerance((int)tolerance);
+        ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveRB).setTargetPositionTolerance((int) tolerance);
         driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -549,10 +569,10 @@ public class FTC11109Code extends LinearOpMode {
         driveRF.setPower(power);
         driveLB.setPower(power);
         driveRB.setPower(power);
-        driveLF.setTargetPosition((int) targetPosition);
-        driveRF.setTargetPosition((int) -targetPosition);
-        driveLB.setTargetPosition((int) -targetPosition);
-        driveRB.setTargetPosition((int) targetPosition);
+        driveLF.setTargetPosition(targetPosition);
+        driveRF.setTargetPosition(-targetPosition);
+        driveLB.setTargetPosition(-targetPosition);
+        driveRB.setTargetPosition(targetPosition);
         driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -569,15 +589,13 @@ public class FTC11109Code extends LinearOpMode {
     }
 
 
-
-
     private void strafeToPositionIMU(double targetInches, double power, int sleepTime, double tolerance, double targetHeading) {
         int targetPosition = (int) (targetInches * 32.5);
         tolerance = tolerance * 32.5;
-        ((DcMotorEx) driveLF).setTargetPositionTolerance((int)tolerance);
-        ((DcMotorEx) driveRF).setTargetPositionTolerance((int)tolerance);
-        ((DcMotorEx) driveLB).setTargetPositionTolerance((int)tolerance);
-        ((DcMotorEx) driveRB).setTargetPositionTolerance((int)tolerance);
+        ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveRB).setTargetPositionTolerance((int) tolerance);
         driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -586,10 +604,10 @@ public class FTC11109Code extends LinearOpMode {
         driveRF.setPower(power);
         driveLB.setPower(power);
         driveRB.setPower(power);
-        driveLF.setTargetPosition((int) targetPosition);
-        driveRF.setTargetPosition((int) -targetPosition);
-        driveLB.setTargetPosition((int) -targetPosition);
-        driveRB.setTargetPosition((int) targetPosition);
+        driveLF.setTargetPosition(targetPosition);
+        driveRF.setTargetPosition(-targetPosition);
+        driveLB.setTargetPosition(-targetPosition);
+        driveRB.setTargetPosition(targetPosition);
         driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -625,7 +643,7 @@ public class FTC11109Code extends LinearOpMode {
         double headingError = targetHeading - robotHeading;
 
         // Normalize the error to be within +/- 180 degrees
-        while (headingError > 180)  headingError -= 360;
+        while (headingError > 180) headingError -= 360;
         while (headingError <= -180) headingError += 360;
 
         // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
@@ -633,10 +651,9 @@ public class FTC11109Code extends LinearOpMode {
     }
 
     public double getRawHeading() {
-        Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
     }
-
 
 
     private void driveTelemetryRunToPosition() {
@@ -687,10 +704,10 @@ public class FTC11109Code extends LinearOpMode {
         driveRF.setPower(powerR);
         driveLB.setPower(powerL);
         driveRB.setPower(powerR);
-        driveLF.setTargetPosition((int) targetPositionL);
-        driveRF.setTargetPosition((int) targetPositionR);
-        driveLB.setTargetPosition((int) targetPositionL);
-        driveRB.setTargetPosition((int) targetPositionR);
+        driveLF.setTargetPosition(targetPositionL);
+        driveRF.setTargetPosition(targetPositionR);
+        driveLB.setTargetPosition(targetPositionL);
+        driveRB.setTargetPosition(targetPositionR);
         driveLF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveRF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveLB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -706,7 +723,7 @@ public class FTC11109Code extends LinearOpMode {
         ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveRB).setTargetPositionTolerance((int) tolerance);
-        initRunToPositionLeftRight((int) targetPositionL, (int) targetPositionR, powerL, powerR, sleepTime);
+        initRunToPositionLeftRight(targetPositionL, targetPositionR, powerL, powerR, sleepTime);
         while (opModeIsActive()) {
 
             if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
@@ -777,16 +794,6 @@ public class FTC11109Code extends LinearOpMode {
 */
 
 
-
-
-
-
-
-
-
-
-
-
     private void turnToAngle(int targetAngle, double turnPower, double turnPower2, int sleepTime) {
         turn(targetAngle, turnPower, turnPower2, 2, 4, 4);
     }
@@ -844,13 +851,12 @@ public class FTC11109Code extends LinearOpMode {
     }
 
 
-
     private void setTargets(int arm, int slide) {
         armTarget = arm;
         slideTarget = slide;
     }
 
-    private void pickupAndDelivery () {
+    private void pickupAndDelivery() {
         int slideTargetOld = slideTarget;
         int armTargetOld = armTarget;
 
@@ -897,7 +903,6 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
-
         if (armTarget != armTargetOld) {
             //motorArm.setTargetPosition(armTarget);
         }
@@ -916,13 +921,7 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
-
-
     }
-
-
-
-
 
 
 }
