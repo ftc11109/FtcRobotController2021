@@ -110,6 +110,32 @@ public class FTC11109Code extends LinearOpMode {
     final double COUNTS_PER_INCH = 31.5;
 
 
+    final int slidePickupLow = 1000;
+    final int armPickupLow = 1001;
+
+    final int slidePickupHigh = 2000;
+    final int armPickupHigh = 2001;
+
+    final int slideDeliverGround = 100;
+    final int armDeliverGround = 101;
+
+    final int slideDeliverLow = 200;
+    final int armDeliverLow = 201;
+
+    final int slideDeliverMedium = 300;
+    final int armDeliverMedium = 301;
+
+    final int slideDeliverHigh = 400;
+    final int armDeliverHigh = 401;
+
+    int slideTarget;
+    int armTarget;
+    double intakePower;
+
+    final double manualSlideMultiplier = 10.0;
+    final double manualArmMultiplier = 10.0;
+
+
     String startColor;
     String startAorJ;
 
@@ -211,6 +237,9 @@ public class FTC11109Code extends LinearOpMode {
             detectSignalSleeveSide = new DetectSignalSleeveSide();
             detectSignalSleeveSide.init(hardwareMap);
         }
+
+        slideTarget = 0;
+        armTarget = 0;
 
 
     }
@@ -314,6 +343,7 @@ public class FTC11109Code extends LinearOpMode {
         }
 
         gamepadDriveMotors();
+        pickupAndDelivery();
 
         if (telemetryEnabled) {
             // updateDriverStation
@@ -678,7 +708,7 @@ public class FTC11109Code extends LinearOpMode {
         ((DcMotorEx) driveRB).setTargetPositionTolerance((int) tolerance);
         initRunToPositionLeftRight((int) targetPositionL, (int) targetPositionR, powerL, powerR, sleepTime);
         while (opModeIsActive()) {
-            
+
             if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
                 continue;
             }
@@ -815,7 +845,80 @@ public class FTC11109Code extends LinearOpMode {
 
 
 
+    private void setTargets(int arm, int slide) {
+        armTarget = arm;
+        slideTarget = slide;
+    }
 
+    private void pickupAndDelivery () {
+        int slideTargetOld = slideTarget;
+        int armTargetOld = armTarget;
+
+        double intakePowerOld = intakePower;
+
+        if (gamepad2.y) {
+            setTargets(armDeliverHigh, slideDeliverHigh);
+        } else if (gamepad2.b) {
+            setTargets(armDeliverMedium, slideDeliverMedium);
+        } else if (gamepad2.a) {
+            setTargets(armDeliverLow, slideDeliverLow);
+        } else if (gamepad2.x) {
+            setTargets(armDeliverGround, slideDeliverGround);
+        }
+
+        if (gamepad2.dpad_up) {
+            setTargets(armPickupHigh, slidePickupHigh);
+        } else if (gamepad2.dpad_down) {
+            setTargets(armPickupLow, slidePickupLow);
+        }
+
+        {
+            double leftStick = -gamepad2.left_stick_y;
+            if (Math.abs(leftStick) > 0.05) {
+                slideTarget += (int) (leftStick * manualSlideMultiplier);
+            }
+        }
+
+        {
+            double rightStick = -gamepad2.right_stick_y;
+            if (Math.abs(rightStick) > 0.05) {
+                armTarget += (int) (rightStick * manualArmMultiplier);
+            }
+        }
+
+        {
+            if (gamepad1.right_bumper) {
+                intakePower = -1.0;
+            } else if (gamepad1.left_bumper || gamepad2.left_bumper) {
+                intakePower = 1.0;
+            } else {
+                intakePower = 0.0;
+            }
+        }
+
+
+
+        if (armTarget != armTargetOld) {
+            //motorArm.setTargetPosition(armTarget);
+        }
+
+        if (slideTarget != slideTargetOld) {
+            //motorSlide.setTargetPosition(slideTarget);
+        }
+
+        if (intakePower != intakePowerOld) {
+            //motorIntake.setPower(intakePower);
+        }
+
+        if (telemetryEnabled) {
+            telemetry.addData("armTarget", armTarget);
+            telemetry.addData("slideTarget", slideTarget);
+        }
+
+
+
+
+    }
 
 
 

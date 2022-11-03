@@ -144,7 +144,7 @@
 //    stringRelease = 0.5;
 //    if (teleop) {
 //      // Read a file (custom block).
-//      startColor = Files.readFile("startColor");
+//      startColor = Files.readFileString("startColor");
 //    } else {
 //      startColor = "red";
 //    }
@@ -192,7 +192,7 @@
 //    // Wait for start command from Driver Station.
 //    if (teleop == false) {
 //      // Save to a file (custom block).
-//      if (Files.saveFile("startColor", startColor)) {
+//      if (Files.saveFileString("startColor", startColor)) {
 //      } else if (false) {
 //      }
 //    }
