@@ -1,3 +1,32 @@
+/* TODO
+* Required:
+ * All: Configure arm and slide positions for pickup and delivery.
+ * Teleop: save & restore IMU (and/or have a "reset heading" button?  check if static class variables carry over?)
+ * Teleop: make sure slide and arm positions carry over (don't reset encoders?)
+ * Auto: Test Red Audience.
+ * Auto: For StartColor and StartAorJ use finals instead of literal strings.
+ * Auto: Make a helper: boolean StartSpot(color, side) to check if they match.
+ * Auto: Write and test Blue Audience.
+ * Auto: Write AutoDeliverCone() and use it.
+ * Auto: Write and test Red Judge.
+ * Auto: Write and test Blue Judge.
+ * Auto: Write AutoPickupCone() and use it.
+
+* High priority:
+ * Teleop: One button to press to pick up cone.  Releasing button moves to slideDeliverMedium?
+ * Auto: detect red line to center on cone stack.
+
+* Low Priority:
+ * Teleop: Pressing button picks up cone, detects when it's picked up, then goes to slideDeliverMedium.
+ * Auto: if camera init fails, pick best parking spot to start tele.
+ * All: Split myStart and myLoop to AutoStart and TeleStart and TeleLoop.
+ * All: use camera to detect junction left/right/centered and automatically center if needed.
+
+* Done:
+ * Auto: park based on signal side
+ */
+
+
 /* Copyright (c) 2017 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
