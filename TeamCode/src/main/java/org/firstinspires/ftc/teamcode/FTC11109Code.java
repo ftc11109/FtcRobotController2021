@@ -171,6 +171,15 @@ public class FTC11109Code extends LinearOpMode {
     final double manualArmMultiplier = 10.0;
 
 
+    final int armTargetPickup = -1000;
+    final int armTargetPickupOne = armTargetPickup;
+    final int armTargetPickupTwo = armTargetPickup;
+    final int armTargetPickupThree = armTargetPickup;
+    final int armTargetPickupFour = armTargetPickup;
+    final int armTargetPickupFive = armTargetPickup;
+
+
+
     String startColor;
     String startAorJ;
 
@@ -349,7 +358,7 @@ public class FTC11109Code extends LinearOpMode {
             //deliver cone
 
             // if we didn't detect a parking spot, pick a good default
-            if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING){
+            if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
                 parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT;
             }
             // actually park!
@@ -359,19 +368,16 @@ public class FTC11109Code extends LinearOpMode {
                 runToPositionLeftRight(-44, -44, .3, .3, sleepTime, tolerance);
                 //pickup cone
 
-            }
-            else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
                 runToPositionLeftRight(-14, 0, .3, .3, sleepTime, tolerance);
                 turn(-90, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
                 runToPositionLeftRight(-20, -20, .3, .3, sleepTime, tolerance);
                 turn(-180, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
 
-            }
-            else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT){
+            } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
                 runToPositionLeftRight(-14, 0, .3, .3, sleepTime, tolerance);
                 turn(-180, .3, powerin2, turnTolerance, 2, failSafeCountThreshold);
             }
-
 
 
         }
@@ -921,15 +927,41 @@ public class FTC11109Code extends LinearOpMode {
             }
         }
 
+
+        // TODO fix this
+        boolean buttonPushed = false;
+        boolean buttonPushedLast = false;
+        { //pickup cone
+            if (gamepad1.left_trigger > 0.5 || gamepad2.left_trigger > 0.5) {
+                buttonPushed = true;
+
+            } else {
+                buttonPushed = false;
+
+            }
+
+            if (buttonPushed) {
+                armTarget = armTargetPickup;
+                intakePower = intakePowerPickup;
+            }
+
+            buttonPushedLast = buttonPushed;
+        }
+
+
+
+
+
         {
             if (gamepad1.right_bumper) {
-                intakePower = -1.0;
+                intakePower = intakePowerDeliver;
             } else if (gamepad1.left_bumper || gamepad2.left_bumper) {
-                intakePower = 1.0;
+                intakePower = intakePowerPickup;
             } else {
-                intakePower = 0.0;
+                intakePower = intakePowerHold;
             }
         }
+
 
 
         if (armTarget != armTargetOld) {
@@ -948,6 +980,11 @@ public class FTC11109Code extends LinearOpMode {
             telemetry.addData("armTarget", armTarget);
             telemetry.addData("slideTarget", slideTarget);
         }
+
+
+
+
+
 
 
     }
