@@ -1,4 +1,4 @@
-/* TODO
+/* TODO disable telemetry, calibrate camera detection
 * Required:
  * Auto: tune for new robot
  * New robot can park
@@ -65,7 +65,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -108,7 +107,7 @@ public class FTC11109Code extends LinearOpMode {
     private DcMotor motorIntake = null;
 
     boolean teleop;
-    boolean initIMU;
+    boolean teleopFollowsAuto;
     boolean fieldOrientated;
     boolean parabolicDriving;
 
@@ -181,8 +180,8 @@ public class FTC11109Code extends LinearOpMode {
         teleop = newTeleop;
     }
 
-    public void setInitIMU(boolean newInitIMU) {
-        initIMU = newInitIMU;
+    public void setTeleopFollowsAuto(boolean newTeleopFollowsAuto) {
+        teleopFollowsAuto = newTeleopFollowsAuto;
     }
 
     @Override
@@ -254,7 +253,7 @@ public class FTC11109Code extends LinearOpMode {
         motorArm.setDirection(DcMotor.Direction.FORWARD);
         motorIntake.setDirection(DcMotor.Direction.REVERSE);
 
-        if (initIMU) {
+        if (!teleopFollowsAuto) {
             if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
             motorSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motorArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -292,15 +291,13 @@ public class FTC11109Code extends LinearOpMode {
         // Disable logging.
         imuParameters.loggingEnabled = false;
 
-        if (initIMU) {
-            // Initialize IMU.
-            imu.initialize(imuParameters);
-        }
+        imu.initialize(imuParameters);
+
 
         // Get absolute orientation
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        if (teleop) {
+        if (teleopFollowsAuto) {
             Files files = new Files();
             angleOffset = -files.readFileDouble("IMUOffset");
         }
@@ -384,96 +381,12 @@ public class FTC11109Code extends LinearOpMode {
         }
 
         if (!teleop) {
-            int sleepTime = 500;
-            double tolerance = 0.5;
-            double turnTolerance = 0.2;
-            int failSafeCountThreshold = 4;
-            int targetReachedCountThreshold = 3;
-            double power = .3;
-            double powerin2 = .17;
-
-            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                strafeToPosition(24, .3, sleepTime, tolerance);
-            } else {
-                strafeToPosition(-24, .3, sleepTime, tolerance);
-            }
-            turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-            //motorArm.setTargetPosition(armDeliverHigh);
-            setSlideTarget(slideDeliverHigh);
-            runToPosition(40, .3, sleepTime, tolerance);
-
-            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-            }else{
-                turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-            }
-            //deliver cone
-            sleep(800);
-            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                strafeToPosition(12, .3, sleepTime, tolerance);
-            }else{
-                strafeToPosition(-12, .3, sleepTime, tolerance);
-            }
-            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-            }else{
-                turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-            }
-            runToPosition(48, .3, sleepTime, tolerance);
-            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-            }else{
-                turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-            }
-            //pickup cone
-            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                runToPositionLeftRight(-44, -58, .3, .3, sleepTime, tolerance);
-            }else{
-                runToPositionLeftRight(-58, -44, .3, .3, sleepTime, tolerance);
-            }
-            //deliver cone
-
-            // if we didn't detect a parking spot, pick a good default
-            if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
-                parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT;
-            }
-            // actually park!
-            if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
-                if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                    runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
-                    turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                    runToPositionLeftRight(44, 44, .3, .3, sleepTime, tolerance);
-                    //pickup cone
-                }else{
-                    runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
-                    turn(-180, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                }
-
-
-
-            } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
-                if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                    runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
-                    turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                }else{
-                    runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
-                    turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                }
-                runToPositionLeftRight(20, 20, .3, .3, sleepTime, tolerance);
-                turn(-180, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-
-            } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
-                if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                    runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
-                    turn(-180, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                }else{
-                    runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
-                    turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                    runToPositionLeftRight(44, 44, .3, .3, sleepTime, tolerance);
-                    //pickup cone
-                }
-            }
-
+//            turnToAngle(45, .6, .3);
+//            motorSlideL.setTargetPosition(150);
+//            motorSlideR.setTargetPosition(150);
+//            motorArm.setTargetPosition(100);
+            //auto1();
+            autoDeliverPark();
 
         }
     }
@@ -486,6 +399,7 @@ public class FTC11109Code extends LinearOpMode {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         if (telemetryEnabled) {
+            telemetry.addData("angleOffset", angleOffset);
             telemetry.addData("rot about Z", angles.firstAngle);
             telemetry.addData("rot about Z with offset", angles.firstAngle + angleOffset);
             telemetry.addData("rot about Y", angles.secondAngle);
@@ -692,8 +606,8 @@ public class FTC11109Code extends LinearOpMode {
     }
 
     private void strafeToPosition(double targetInches, double power, int sleepTime, double tolerance) {
-        int targetPosition = (int) (targetInches * 32.5);
-        tolerance = tolerance * 32.5;
+        int targetPosition = (int) (targetInches * COUNTS_PER_INCH);
+        tolerance = tolerance * COUNTS_PER_INCH;
         ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
@@ -727,8 +641,8 @@ public class FTC11109Code extends LinearOpMode {
 
 
     private void strafeToPositionIMU(double targetInches, double power, int sleepTime, double tolerance, double targetHeading) {
-        int targetPosition = (int) (targetInches * 32.5);
-        tolerance = tolerance * 32.5;
+        int targetPosition = (int) (targetInches * COUNTS_PER_INCH);
+        tolerance = tolerance * COUNTS_PER_INCH;
         ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
@@ -931,7 +845,7 @@ public class FTC11109Code extends LinearOpMode {
 */
 
 
-    private void turnToAngle(int targetAngle, double turnPower, double turnPower2, int sleepTime) {
+    private void turnToAngle(int targetAngle, double turnPower, double turnPower2){
         turn(targetAngle, turnPower, turnPower2, 2, 4, 4);
     }
 
@@ -1126,5 +1040,270 @@ public class FTC11109Code extends LinearOpMode {
     private void autoPickupCode() {
 
     }
+
+    private void auto1() {
+        int sleepTime = 500;
+        double tolerance = 0.5;
+        double turnTolerance = 0.2;
+        int failSafeCountThreshold = 4;
+        int targetReachedCountThreshold = 3;
+        double power = .3;
+        double powerin2 = .17;
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            strafeToPosition(24, .3, sleepTime, tolerance);
+        } else {
+            strafeToPosition(-24, .3, sleepTime, tolerance);
+        }
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        //motorArm.setTargetPosition(armDeliverHigh);
+        setSlideTarget(slideDeliverHigh);
+        runToPosition(40, .3, sleepTime, tolerance);
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        }else{
+            turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        }
+        //deliver cone
+        sleep(800);
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            strafeToPosition(12, .3, sleepTime, tolerance);
+        }else{
+            strafeToPosition(-12, .3, sleepTime, tolerance);
+        }
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        }else{
+            turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        }
+        runToPosition(48, .3, sleepTime, tolerance);
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        }else{
+            turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        }
+        //pickup cone
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            runToPositionLeftRight(-44, -58, .3, .3, sleepTime, tolerance);
+        }else{
+            runToPositionLeftRight(-58, -44, .3, .3, sleepTime, tolerance);
+        }
+        //deliver cone
+
+        // if we didn't detect a parking spot, pick a good default
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
+            parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT;
+        }
+        // actually park!
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
+                turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+                runToPositionLeftRight(44, 44, .3, .3, sleepTime, tolerance);
+                //pickup cone
+            }else{
+                runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
+                turn(-180, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+            }
+
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
+                turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+            }else{
+                runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
+                turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+            }
+            runToPositionLeftRight(20, 20, .3, .3, sleepTime, tolerance);
+            turn(-180, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
+                turn(-180, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+            }else{
+                runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
+                turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+                runToPositionLeftRight(44, 44, .3, .3, sleepTime, tolerance);
+                //pickup cone
+            }
+        }
+
+    }
+
+
+
+    private void autoPark() {
+        int sleepTime = 500;
+        double tolerance = 0.2;
+        double turnTolerance = 0.2;
+        int failSafeCountThreshold = 4;
+        int targetReachedCountThreshold = 3;
+        double power = .3;
+        double powerin2 = .17;
+
+        runToPosition(2, .3, sleepTime, tolerance);
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            strafeToPosition(24, .3, sleepTime, tolerance);
+        } else {
+            strafeToPosition(-24, .3, sleepTime, tolerance);
+        }
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+
+        runToPosition(46, .3, sleepTime, tolerance);
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+        // if we didn't detect a parking spot, pick a good default
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
+            parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER;
+        }
+
+        // actually park!
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                 strafeToPosition(-48, 0.3, sleepTime, tolerance);
+            }else{
+                 strafeToPosition(48, 0.3, sleepTime, tolerance);
+            }
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(-24, 0.3, sleepTime, tolerance);
+
+            }else{
+                strafeToPosition(24, 0.3, sleepTime, tolerance);
+            }
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+
+            }else{
+
+            }
+        }
+
+
+        turn(0, 3, .1, 0.2, 4, 4);
+
+
+    }
+
+
+
+    private void autoDeliverPark() {
+        int sleepTime = 500;
+        double tolerance = 0.2;
+        double turnTolerance = 0.2;
+        int failSafeCountThreshold = 4;
+        int targetReachedCountThreshold = 3;
+        double power = .3;
+        double powerin2 = .17;
+
+        runToPosition(2, .3, sleepTime, tolerance);
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            strafeToPosition(24, .3, sleepTime, tolerance);
+        } else {
+            strafeToPosition(-24, .3, sleepTime, tolerance);
+        }
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+
+        runToPosition(35.5, .3, sleepTime, tolerance);
+
+
+        motorArm.setTargetPosition(armDeliverMedium);
+        motorSlideL.setTargetPosition(slideDeliverMedium);
+        motorSlideR.setTargetPosition(slideDeliverMedium);
+        motorIntake.setPower(intakePowerPickup);
+
+        sleep(3000);
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        }else{
+            turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        }
+
+        if (Spot(RED, AUDIENCE)) runToPosition(-6, .3, sleepTime, tolerance);
+        if (Spot(RED, JUDGE)) runToPosition(-5, .3, sleepTime, tolerance);
+        if (Spot(BLUE, AUDIENCE)) runToPosition(-5, .3, sleepTime, tolerance);
+        if (Spot(BLUE, JUDGE)) runToPosition(-5, .3, sleepTime, tolerance);
+
+
+        motorSlideL.setTargetPosition(slideDeliverMedium - 70);
+        motorSlideR.setTargetPosition(slideDeliverMedium - 70);
+        sleep(1000);
+
+        motorIntake.setPower(intakePowerDeliver);
+        sleep(1000);
+        motorIntake.setPower(0);
+
+        if (Spot(RED, AUDIENCE)) runToPosition(6, .3, sleepTime, tolerance);
+        if (Spot(RED, JUDGE)) runToPosition(5, .3, sleepTime, tolerance);
+        if (Spot(BLUE, AUDIENCE)) runToPosition(5, .3, sleepTime, tolerance);
+        if (Spot(BLUE, JUDGE)) runToPosition(5, .3, sleepTime, tolerance);
+
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+        motorArm.setTargetPosition(0);
+        motorSlideL.setTargetPosition(0);
+        motorSlideR.setTargetPosition(0);
+
+        sleep(1500);
+
+        runToPosition(10.5, 0.3, sleepTime, tolerance);
+
+
+
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+
+        // if we didn't detect a parking spot, pick a good default
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
+            parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER;
+        }
+
+        // actually park!
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(-48, 0.3, sleepTime, tolerance);
+            }else{
+
+            }
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(-24, 0.3, sleepTime, tolerance);
+
+            }else{
+                strafeToPosition(24, 0.3, sleepTime, tolerance);
+            }
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+
+            }else{
+                strafeToPosition(48, 0.3, sleepTime, tolerance);
+            }
+        }
+
+
+        turn(0, 3, .1, 0.2, 4, 4);
+
+
+    }
+
 
 }

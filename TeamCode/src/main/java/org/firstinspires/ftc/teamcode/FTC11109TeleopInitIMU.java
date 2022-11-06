@@ -52,7 +52,7 @@ public class FTC11109TeleopInitIMU extends FTC11109Code {
     @Override
     public void runOpMode() {
         setTeleop(true);
-        setInitIMU(true);
+        setTeleopFollowsAuto(false);
         super.runOpMode();
     }
 
