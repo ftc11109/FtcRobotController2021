@@ -1,15 +1,10 @@
 /* TODO
 * Required:
- * All: Configure arm and slide positions for pickup and delivery.
- * Teleop: save & restore IMU (and/or have a "reset heading" button?  check if static class variables carry over?)
- * Teleop: make sure slide and arm positions carry over (don't reset encoders?)
- * Auto: Test Red Audience.
- * Auto: For StartColor and StartAorJ use finals instead of literal strings.
- * Auto: Make a helper: boolean StartSpot(color, side) to check if they match.
- * Auto: Write and test Blue Audience.
- * Auto: Write AutoDeliverCone() and use it.
- * Auto: Write and test Red Judge.
- * Auto: Write and test Blue Judge.
+ * Auto: tune for new robot
+ * New robot can park
+  * Teleop: make sure slide and arm positions carry over (don't reset encoders?)
+
+
  * Auto: Write AutoPickupCone() and use it.
 
 * High priority:
@@ -24,6 +19,15 @@
 
 * Done:
  * Auto: park based on signal side
+ * Auto: Test Red Audience.
+ * Auto: For StartColor and StartAorJ use finals instead of literal strings.
+ * Auto: Make a helper: boolean StartSpot(color, side) to check if they match.
+ * Auto: Write and test Blue Audience.
+ * Auto: Write AutoDeliverCone() and use it.
+ * Auto: Write and test Red Judge.
+ * Auto: Write and test Blue Judge.
+ * Teleop: save & restore IMU (and/or have a "reset heading" button?  check if static class variables carry over?)
+ * All: Configure arm and slide positions for pickup and delivery.
  */
 
 
@@ -59,44 +63,18 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
-import android.graphics.Color;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import java.util.List;
-
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.Tfod;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -124,6 +102,11 @@ public class FTC11109Code extends LinearOpMode {
     private DcMotor driveRF = null;
     private DcMotor driveRB = null;
 
+    private DcMotor motorSlideL = null;
+    private DcMotor motorSlideR = null;
+    private DcMotor motorArm = null;
+    private DcMotor motorIntake = null;
+
     boolean teleop;
     boolean initIMU;
     boolean fieldOrientated;
@@ -134,30 +117,32 @@ public class FTC11109Code extends LinearOpMode {
     Orientation angles;
     BNO055IMU.Parameters imuParameters;
     private BNO055IMU imu;
+    double angleOffset = 0.0;
 
     final double headingOffset = 0.0;
     final double P_DRIVE_GAIN = 0.03;
 
-    final double COUNTS_PER_INCH = 31.5;
+    final double COUNTS_PER_INCH = 57.005;
 
 
-    final int slidePickupLow = 1000;
-    final int armPickupLow = 1001;
+    final int slidePickupLow = 137;
+    final int armPickupLow = 5;
 
-    final int slidePickupHigh = 2000;
-    final int armPickupHigh = 2001;
+    // TODO calibrate slidePickupHigh
+    final int slidePickupHigh = 440;
+    final int armPickupHigh = 5;
 
-    final int slideDeliverGround = 100;
-    final int armDeliverGround = 101;
+    final int slideDeliverGround = 20;
+    final int armDeliverGround = 5;
 
-    final int slideDeliverLow = 200;
-    final int armDeliverLow = 201;
+    final int slideDeliverLow = 445;
+    final int armDeliverLow = 1050;
 
-    final int slideDeliverMedium = 300;
-    final int armDeliverMedium = 301;
+    final int slideDeliverMedium = 230;
+    final int armDeliverMedium = 708;
 
-    final int slideDeliverHigh = 400;
-    final int armDeliverHigh = 401;
+    final int slideDeliverHigh = 445;
+    final int armDeliverHigh = 620;
 
     final double intakePowerDeliver = -1.0;
     final double intakePowerPickup = 1.0;
@@ -172,12 +157,10 @@ public class FTC11109Code extends LinearOpMode {
     final double manualArmMultiplier = 10.0;
 
 
-    final int armTargetPickup = -1000;
-    final int armTargetPickupOne = armTargetPickup;
-    final int armTargetPickupTwo = armTargetPickup;
-    final int armTargetPickupThree = armTargetPickup;
-    final int armTargetPickupFour = armTargetPickup;
-    final int armTargetPickupFive = armTargetPickup;
+    final int slideTargetPickup = -1000;
+
+    final boolean bothSlideMotors = true;
+
 
 
 
@@ -191,6 +174,8 @@ public class FTC11109Code extends LinearOpMode {
 
     DetectSignalSleeveSide detectSignalSleeveSide;
     DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition parkingPosition;
+
+    boolean buttonPushedLast = false;
 
     public void setTeleop(boolean newTeleop) {
         teleop = newTeleop;
@@ -242,22 +227,55 @@ public class FTC11109Code extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        driveLF = hardwareMap.get(DcMotor.class, "left_driveF");
-        driveLB = hardwareMap.get(DcMotor.class, "left_driveB");
-        driveRF = hardwareMap.get(DcMotor.class, "right_driveF");
-        driveRB = hardwareMap.get(DcMotor.class, "right_driveB");
+        driveLF = hardwareMap.get(DcMotor.class, "driveLF");
+        driveLB = hardwareMap.get(DcMotor.class, "driveLB");
+        driveRF = hardwareMap.get(DcMotor.class, "driveRF");
+        driveRB = hardwareMap.get(DcMotor.class, "driveRB");
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        driveLF.setDirection(DcMotor.Direction.FORWARD);
+        driveLF.setDirection(DcMotor.Direction.REVERSE);
         driveLB.setDirection(DcMotor.Direction.FORWARD);
         driveRF.setDirection(DcMotor.Direction.REVERSE);
-        driveRB.setDirection(DcMotor.Direction.REVERSE);
+        driveRB.setDirection(DcMotor.Direction.FORWARD);
 
         driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        if (bothSlideMotors) motorSlideL = hardwareMap.get(DcMotor.class, "motorSlideL");
+        motorSlideR = hardwareMap.get(DcMotor.class, "motorSlideR");
+        motorArm = hardwareMap.get(DcMotor.class, "motorArm");
+        motorIntake = hardwareMap.get(DcMotor.class, "motorIntake");
+
+        if (bothSlideMotors) {motorSlideL.setDirection(DcMotor.Direction.REVERSE);}
+        motorSlideR.setDirection(DcMotor.Direction.FORWARD);
+        motorArm.setDirection(DcMotor.Direction.FORWARD);
+        motorIntake.setDirection(DcMotor.Direction.REVERSE);
+
+        if (initIMU) {
+            if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
+            motorSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motorArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motorIntake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+
+        if (bothSlideMotors) {motorSlideL.setPower(1);}
+        motorSlideR.setPower(.6);
+        motorArm.setPower(.3);
+        motorIntake.setPower(0);
+
+        if (bothSlideMotors) {motorSlideL.setTargetPosition(0);}
+        motorSlideR.setTargetPosition(0);
+        motorArm.setTargetPosition(0);
+
+        if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);}
+        motorSlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        motorIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
 
         // Tell the driver that initialization is complete.
@@ -281,6 +299,11 @@ public class FTC11109Code extends LinearOpMode {
 
         // Get absolute orientation
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        if (teleop) {
+            Files files = new Files();
+            angleOffset = -files.readFileDouble("IMUOffset");
+        }
 
         if (!teleop) {
 
@@ -330,6 +353,13 @@ public class FTC11109Code extends LinearOpMode {
             telemetry.addData("average green", detectSignalSleeveSide.getAverageGreen());
             telemetry.addData("average blue", detectSignalSleeveSide.getAverageBlue());
         }
+        if (telemetryEnabled) {
+            telemetry.addData("motorArm", motorArm.getCurrentPosition());
+            if (bothSlideMotors) {telemetry.addData("motorSlideL", motorSlideL.getCurrentPosition());}
+            telemetry.addData("motorSlideR", motorSlideR.getCurrentPosition());
+            telemetry.addData("motorIntake", motorIntake.getCurrentPosition());
+        }
+
         telemetry.update(); //sends telemetry to the driver controller. all telemetry must come BEFORE this line.
 
 
@@ -369,7 +399,7 @@ public class FTC11109Code extends LinearOpMode {
             }
             turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
             //motorArm.setTargetPosition(armDeliverHigh);
-            //motorSlide.setTargetPosition(slideDeliverHigh);
+            setSlideTarget(slideDeliverHigh);
             runToPosition(40, .3, sleepTime, tolerance);
 
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
@@ -457,6 +487,7 @@ public class FTC11109Code extends LinearOpMode {
 
         if (telemetryEnabled) {
             telemetry.addData("rot about Z", angles.firstAngle);
+            telemetry.addData("rot about Z with offset", angles.firstAngle + angleOffset);
             telemetry.addData("rot about Y", angles.secondAngle);
             telemetry.addData("rot about X", angles.thirdAngle);
 
@@ -477,6 +508,12 @@ public class FTC11109Code extends LinearOpMode {
      * Code to run ONCE after the driver hits STOP
      */
     public void myStop() {
+        if (!teleop) {
+            Files files = new Files();
+            double endAngle = getRawHeading();
+            files.saveFileDouble("IMUOffset", endAngle);
+        }
+
         driveLF.setPower(0);
         driveLB.setPower(0);
         driveRF.setPower(0);
@@ -501,22 +538,22 @@ public class FTC11109Code extends LinearOpMode {
         if (teleop) {
             if (fieldOrientated) {
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-                double currentAngle = angles.firstAngle;
+                double currentAngle = angles.firstAngle + angleOffset;
                 tempForward = fwd;
                 fwd = -(strafe * -Math.sin(currentAngle / 180 * Math.PI) + tempForward * Math.cos(currentAngle / 180 * Math.PI));
                 strafe = 1.35 * -(strafe * Math.cos(currentAngle / 180 * Math.PI) + tempForward * Math.sin(currentAngle / 180 * Math.PI));
                 if (gamepad1.a) {
                     // green
-                    rotate = rotate + teleopTurnToAngle(180, currentAngle, 0.4, 0.1);
+                    rotate = rotate + teleopTurnToAngle(180, currentAngle, 0.6, 0.2);
                 } else if (gamepad1.b) {
                     // red
-                    rotate = rotate + teleopTurnToAngle(-90, currentAngle, 0.4, 0.1);
+                    rotate = rotate + teleopTurnToAngle(-90, currentAngle, 0.6, 0.2);
                 } else if (gamepad1.x) {
                     // blue
-                    rotate = rotate + teleopTurnToAngle(90, currentAngle, 0.4, 0.1);
+                    rotate = rotate + teleopTurnToAngle(90, currentAngle, 0.6, 0.2);
                 } else if (gamepad1.y) {
                     // yellow
-                    rotate = rotate + teleopTurnToAngle(0, currentAngle, 0.4, 0.1);
+                    rotate = rotate + teleopTurnToAngle(0, currentAngle, 0.6, 0.2);
                 }
             }
         }
@@ -578,7 +615,7 @@ public class FTC11109Code extends LinearOpMode {
             driveMotors(0, -dpadStrafe, gamepad1.right_stick_x / 3);
         } else {
             if (parabolicDriving) {
-                driveMotors(0.6 * parabolicTransform(gamepad1.left_stick_y), 0.6 * -parabolicTransform(gamepad1.left_stick_x), gamepad1.right_stick_x / 3);
+                driveMotors(0.8 * parabolicTransform(gamepad1.left_stick_y), 0.8 * -parabolicTransform(gamepad1.left_stick_x), gamepad1.right_stick_x / 1.6);
             } else {
                 driveMotors(fwdSign + gamepad1.left_stick_y * 0.5, -(strafeSign + gamepad1.left_stick_x * 0.5), gamepad1.right_stick_x / 4);
             }
@@ -737,7 +774,7 @@ public class FTC11109Code extends LinearOpMode {
 
     public double getSteeringCorrection(double targetHeading, double proportionalGain) {
         // Get the robot heading by applying an offset to the IMU heading
-        double robotHeading = getRawHeading() - headingOffset;
+        double robotHeading = getRawHeading() + angleOffset - headingOffset;
 
         // Determine the heading current error
         double headingError = targetHeading - robotHeading;
@@ -776,8 +813,8 @@ public class FTC11109Code extends LinearOpMode {
     }
 
     private void runToPosition(double targetInches, double power, int sleepTime, double tolerance) {
-        int targetPosition = (int) (targetInches * 31.25);
-        tolerance = tolerance * 31.25;
+        int targetPosition = (int) (targetInches * COUNTS_PER_INCH);
+        tolerance = tolerance * COUNTS_PER_INCH;
         runToPositionInit(targetPosition, power);
         while (opModeIsActive()) {
             if (telemetryEnabled) {
@@ -816,9 +853,9 @@ public class FTC11109Code extends LinearOpMode {
     }
 
     private void runToPositionLeftRight(double targetInchesL, double targetInchesR, double powerL, double powerR, int sleepTime, double tolerance) {
-        int targetPositionL = (int) (targetInchesL * 31.25);
-        int targetPositionR = (int) (targetInchesR * 31.25);
-        tolerance = tolerance * 31.25;
+        int targetPositionL = (int) (targetInchesL * COUNTS_PER_INCH);
+        int targetPositionR = (int) (targetInchesR * COUNTS_PER_INCH);
+        tolerance = tolerance * COUNTS_PER_INCH;
         ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
@@ -906,7 +943,7 @@ public class FTC11109Code extends LinearOpMode {
         int targetReachedCount = 0;
         while (opModeIsActive()) {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            double currentAngle = angles.firstAngle;
+            double currentAngle = angles.firstAngle + angleOffset;
             double angleDifference = targetAngle - currentAngle;
             if (angleDifference > 180) {
                 angleDifference += -360;
@@ -993,32 +1030,36 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
-        // TODO fix this
-        boolean buttonPushed = false;
-        boolean buttonPushedLast = false;
-        { //pickup cone
-            if (gamepad1.left_trigger > 0.5 || gamepad2.left_trigger > 0.5) {
-                buttonPushed = true;
-
-            } else {
-                buttonPushed = false;
-
-            }
-
-            if (buttonPushed) {
-                armTarget = armTargetPickup;
-                intakePower = intakePowerPickup;
-            }
-
-            buttonPushedLast = buttonPushed;
-        }
+//        // TODO fix this
+//        boolean buttonPushed = false;
+//
+//        { //pickup cone
+//            if (gamepad1.left_trigger > 0.5 || gamepad2.left_trigger > 0.5) {
+//                buttonPushed = true;
+//
+//            } else {
+//                buttonPushed = false;
+//
+//            }
+//
+//            if (buttonPushed) {
+//                slideTarget = slideTargetPickup;
+//                intakePower = intakePowerPickup;
+//            }
+//            else if(buttonPushed == false && buttonPushedLast == true){
+//                slideTarget = slidePickupHigh;
+//                intakePower = intakePowerHold;
+//            }
+//
+//            buttonPushedLast = buttonPushed;
+//        }
 
 
 
 
 
         {
-            if (gamepad1.right_bumper) {
+            if (gamepad1.right_bumper || gamepad2.right_bumper) {
                 intakePower = intakePowerDeliver;
             } else if (gamepad1.left_bumper || gamepad2.left_bumper) {
                 intakePower = intakePowerPickup;
@@ -1028,17 +1069,29 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
+        if (slideTarget > 445) {
+            slideTarget = 445;
+        } else if (slideTarget < 5) {
+            slideTarget = 5;
+        }
+
+        if (armTarget < 5) {
+            armTarget = 5;
+        } else if (armTarget > 1150) {
+            armTarget = 1150;
+        }
+
 
         if (armTarget != armTargetOld) {
-            //motorArm.setTargetPosition(armTarget);
+            motorArm.setTargetPosition(armTarget);
         }
 
         if (slideTarget != slideTargetOld) {
-            //motorSlide.setTargetPosition(slideTarget);
+            setSlideTarget(slideTarget);
         }
 
         if (intakePower != intakePowerOld) {
-            //motorIntake.setPower(intakePower);
+            motorIntake.setPower(intakePower);
         }
 
         if (telemetryEnabled) {
@@ -1047,12 +1100,31 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
+        if (telemetryEnabled) {
+            telemetry.addData("motorArm current", motorArm.getCurrentPosition());
+            if (bothSlideMotors) {telemetry.addData("motorSlideL current", motorSlideL.getCurrentPosition());}
+            telemetry.addData("motorSlideR current", motorSlideR.getCurrentPosition());
+            telemetry.addData("motorIntake current", motorIntake.getCurrentPosition());
 
+            telemetry.addData("motorArm target", motorArm.getTargetPosition());
+            if (bothSlideMotors) {telemetry.addData("motorSlideL target", motorSlideL.getTargetPosition());}
+            telemetry.addData("motorSlideR target", motorSlideR.getTargetPosition());
+            telemetry.addData("motorIntake target", motorIntake.getTargetPosition());
+        }
 
 
 
 
     }
 
+
+    private void setSlideTarget(int position) {
+        if (bothSlideMotors) {motorSlideL.setTargetPosition(position);}
+        motorSlideR.setTargetPosition(position);
+    }
+
+    private void autoPickupCode() {
+
+    }
 
 }
