@@ -219,7 +219,7 @@ public class FTC11109Code extends LinearOpMode {
         fieldOrientated = true;
         parabolicDriving = teleop;
 
-        telemetryEnabled = true;
+        telemetryEnabled = false;
 
         telemetry.addData("Status", "Initialized");
 
