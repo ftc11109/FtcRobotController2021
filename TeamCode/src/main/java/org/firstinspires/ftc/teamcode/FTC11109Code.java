@@ -142,7 +142,7 @@ public class FTC11109Code extends LinearOpMode {
     final int slideDeliverMedium = 230;
     final int armDeliverMedium = 1855;
 
-    final int slideDeliverHigh = 445;
+    final int slideDeliverHigh = 480;
     final int armDeliverHigh = 1624;
 
     final double intakePowerDeliver = -1.0;
@@ -155,7 +155,7 @@ public class FTC11109Code extends LinearOpMode {
     double intakePower;
 
     final double manualSlideMultiplier = 10.0;
-    final double manualArmMultiplier = 10.0;
+    final double manualArmMultiplier = 26.0;
     final int armTolerance = 10;
     final double armPower = 0.7;
     final int slideTolerance = 4;
@@ -225,7 +225,7 @@ public class FTC11109Code extends LinearOpMode {
         fieldOrientated = true;
         parabolicDriving = teleop;
 
-        telemetryEnabled = false;
+        telemetryEnabled = true;
 
         telemetry.addData("Status", "Initialized");
 
@@ -996,16 +996,16 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
-        if (slideTarget > 445) {
-            slideTarget = 445;
+        if (slideTarget > 480) {
+            slideTarget = 480;
         } else if (slideTarget < 5) {
             slideTarget = 5;
         }
 
         if (armTarget < 5) {
             armTarget = 5;
-        } else if (armTarget > 1150) {
-            armTarget = 1150;
+        } else if (armTarget > 2800) {
+            armTarget = 2800;
         }
 
 
