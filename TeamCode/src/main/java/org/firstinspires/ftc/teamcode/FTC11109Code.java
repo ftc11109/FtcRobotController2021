@@ -134,14 +134,16 @@ public class FTC11109Code extends LinearOpMode {
     final int slideDeliverGround = 20;
     final int armDeliverGround = 5;
 
+    final int slidePowerOff = 5;
+
     final int slideDeliverLow = 445;
-    final int armDeliverLow = 1050;
+    final int armDeliverLow = 2750;
 
     final int slideDeliverMedium = 230;
-    final int armDeliverMedium = 708;
+    final int armDeliverMedium = 1855;
 
     final int slideDeliverHigh = 445;
-    final int armDeliverHigh = 620;
+    final int armDeliverHigh = 1624;
 
     final double intakePowerDeliver = -1.0;
     final double intakePowerPickup = 1.0;
@@ -154,6 +156,10 @@ public class FTC11109Code extends LinearOpMode {
 
     final double manualSlideMultiplier = 10.0;
     final double manualArmMultiplier = 10.0;
+    final int armTolerance = 10;
+    final double armPower = 0.7;
+    final int slideTolerance = 4;
+    final double slidePower = 0.5;
 
 
     final int slideTargetPickup = -1000;
@@ -260,14 +266,21 @@ public class FTC11109Code extends LinearOpMode {
             motorIntake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
-        if (bothSlideMotors) {motorSlideL.setPower(1);}
-        motorSlideR.setPower(.6);
-        motorArm.setPower(.3);
+        if (bothSlideMotors) {motorSlideL.setPower(slidePower);}
+        motorSlideR.setPower(slidePower);
+        motorArm.setPower(armPower);
         motorIntake.setPower(0);
 
-        if (bothSlideMotors) {motorSlideL.setTargetPosition(0);}
+        ((DcMotorEx) motorSlideR).setTargetPositionTolerance(slideTolerance);
+
+        if (bothSlideMotors) {
+            ((DcMotorEx) motorSlideL).setTargetPositionTolerance(slideTolerance);
+            motorSlideL.setTargetPosition(0);
+        }
+
         motorSlideR.setTargetPosition(0);
         motorArm.setTargetPosition(0);
+        ((DcMotorEx) motorArm).setTargetPositionTolerance(armTolerance);
 
         if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);}
         motorSlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -1035,6 +1048,13 @@ public class FTC11109Code extends LinearOpMode {
     private void setSlideTarget(int position) {
         if (bothSlideMotors) {motorSlideL.setTargetPosition(position);}
         motorSlideR.setTargetPosition(position);
+        if (position <= slidePowerOff) {
+            if (bothSlideMotors) {motorSlideL.setPower(0);}
+            motorSlideR.setPower(0);
+        }else {
+            if (bothSlideMotors) {motorSlideL.setPower(slidePower);}
+            motorSlideR.setPower(slidePower);
+        }
     }
 
     private void autoPickupCode() {
@@ -1237,7 +1257,7 @@ public class FTC11109Code extends LinearOpMode {
         if (Spot(RED, AUDIENCE)) runToPosition(-6, .3, sleepTime, tolerance);
         if (Spot(RED, JUDGE)) runToPosition(-5, .3, sleepTime, tolerance);
         if (Spot(BLUE, AUDIENCE)) runToPosition(-5, .3, sleepTime, tolerance);
-        if (Spot(BLUE, JUDGE)) runToPosition(-5, .3, sleepTime, tolerance);
+        if (Spot(BLUE, JUDGE)) runToPosition(-4, .3, sleepTime, tolerance);
 
 
         motorSlideL.setTargetPosition(slideDeliverMedium - 70);
@@ -1251,7 +1271,7 @@ public class FTC11109Code extends LinearOpMode {
         if (Spot(RED, AUDIENCE)) runToPosition(6, .3, sleepTime, tolerance);
         if (Spot(RED, JUDGE)) runToPosition(5, .3, sleepTime, tolerance);
         if (Spot(BLUE, AUDIENCE)) runToPosition(5, .3, sleepTime, tolerance);
-        if (Spot(BLUE, JUDGE)) runToPosition(5, .3, sleepTime, tolerance);
+        if (Spot(BLUE, JUDGE)) runToPosition(4, .3, sleepTime, tolerance);
 
         turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
 
@@ -1298,6 +1318,10 @@ public class FTC11109Code extends LinearOpMode {
                 strafeToPosition(48, 0.3, sleepTime, tolerance);
             }
         }
+
+
+        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        runToPosition(-1, 0.3, sleepTime, tolerance);
 
 
         turn(0, 3, .1, 0.2, 4, 4);
