@@ -128,22 +128,25 @@ public class FTC11109Code extends LinearOpMode {
     final int armPickupLow = 5;
 
     // TODO calibrate slidePickupHigh
-    final int slidePickupHigh = 440;
+    final int slidePickupHigh = 335;
     final int armPickupHigh = 5;
 
-    final int slideDeliverGround = 20;
+    final int slideDeliverGround = 0;
     final int armDeliverGround = 5;
 
     final int slidePowerOff = 5;
 
-    final int slideDeliverLow = 445;
+    final int slideDeliverLow = 315;
     final int armDeliverLow = 2750;
 
-    final int slideDeliverMedium = 230;
-    final int armDeliverMedium = 1855;
+    final int slideDeliverMedium = 130;
+    final int armDeliverMedium = 1840;
 
-    final int slideDeliverHigh = 480;
-    final int armDeliverHigh = 1624;
+    final int slideDeliverHigh = 465;
+    final int armDeliverHigh = 1720;
+
+    final int slideMax = 466;
+    final int armMax = 2800;
 
     final double intakePowerDeliver = -1.0;
     final double intakePowerPickup = 1.0;
@@ -996,16 +999,16 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
-        if (slideTarget > 480) {
-            slideTarget = 480;
-        } else if (slideTarget < 5) {
-            slideTarget = 5;
+        if (slideTarget > slideMax) {
+            slideTarget = slideMax;
+        } else if (slideTarget < 0) {
+            slideTarget = 0;
         }
 
-        if (armTarget < 5) {
-            armTarget = 5;
-        } else if (armTarget > 2800) {
-            armTarget = 2800;
+        if (armTarget < 0) {
+            armTarget = 0;
+        } else if (armTarget > armMax) {
+            armTarget = armMax;
         }
 
 
