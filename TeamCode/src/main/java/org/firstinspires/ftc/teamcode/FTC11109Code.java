@@ -398,8 +398,9 @@ public class FTC11109Code extends LinearOpMode {
 //            motorSlideL.setTargetPosition(150);
 //            motorSlideR.setTargetPosition(150);
 //            motorArm.setTargetPosition(100);
-            //auto1();
-            autoDeliverPark();
+//            auto1();
+//            autoDeliverPark();
+            autoTest();
 
         }
     }
@@ -1224,21 +1225,23 @@ public class FTC11109Code extends LinearOpMode {
         double turnTolerance = 0.2;
         int failSafeCountThreshold = 4;
         int targetReachedCountThreshold = 3;
-        double power = .3;
-        double powerin2 = .17;
+        double powerTurnHigh = .3;
+        double powerTurnLow = .17;
+        double powerDriveHigh = .3;
+        double powerDriveLow = .17;
 
-        runToPosition(2, .3, sleepTime, tolerance);
-        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        runToPosition(2, powerDriveHigh, sleepTime, tolerance);
+        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
 
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-            strafeToPosition(24, .3, sleepTime, tolerance);
+            strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
         } else {
-            strafeToPosition(-24, .3, sleepTime, tolerance);
+            strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
         }
-        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
 
 
-        runToPosition(35.5, .3, sleepTime, tolerance);
+        runToPosition(35.5, powerDriveHigh, sleepTime, tolerance);
 
 
         motorArm.setTargetPosition(armDeliverMedium);
@@ -1249,15 +1252,15 @@ public class FTC11109Code extends LinearOpMode {
         sleep(3000);
 
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-            turn(-90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+            turn(-90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
         }else{
-            turn(90, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+            turn(90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
         }
 
-        if (Spot(RED, AUDIENCE)) runToPosition(-6, .3, sleepTime, tolerance);
-        if (Spot(RED, JUDGE)) runToPosition(-5, .3, sleepTime, tolerance);
-        if (Spot(BLUE, AUDIENCE)) runToPosition(-5, .3, sleepTime, tolerance);
-        if (Spot(BLUE, JUDGE)) runToPosition(-4, .3, sleepTime, tolerance);
+        if (Spot(RED, AUDIENCE)) runToPosition(-6, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(RED, JUDGE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(BLUE, AUDIENCE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(BLUE, JUDGE)) runToPosition(-4, powerDriveHigh, sleepTime, tolerance);
 
 
         motorSlideL.setTargetPosition(slideDeliverMedium - 70);
@@ -1268,12 +1271,12 @@ public class FTC11109Code extends LinearOpMode {
         sleep(1000);
         motorIntake.setPower(0);
 
-        if (Spot(RED, AUDIENCE)) runToPosition(6, .3, sleepTime, tolerance);
-        if (Spot(RED, JUDGE)) runToPosition(5, .3, sleepTime, tolerance);
-        if (Spot(BLUE, AUDIENCE)) runToPosition(5, .3, sleepTime, tolerance);
-        if (Spot(BLUE, JUDGE)) runToPosition(4, .3, sleepTime, tolerance);
+        if (Spot(RED, AUDIENCE)) runToPosition(6, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(RED, JUDGE)) runToPosition(5, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(BLUE, AUDIENCE)) runToPosition(5, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(BLUE, JUDGE)) runToPosition(4, powerDriveHigh, sleepTime, tolerance);
 
-        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
 
         motorArm.setTargetPosition(0);
         motorSlideL.setTargetPosition(0);
@@ -1281,11 +1284,11 @@ public class FTC11109Code extends LinearOpMode {
 
         sleep(1500);
 
-        runToPosition(10.5, 0.3, sleepTime, tolerance);
+        runToPosition(10.5, powerDriveHigh, sleepTime, tolerance);
 
 
 
-        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
 
 
         // if we didn't detect a parking spot, pick a good default
@@ -1296,7 +1299,7 @@ public class FTC11109Code extends LinearOpMode {
         // actually park!
         if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                strafeToPosition(-48, 0.3, sleepTime, tolerance);
+                strafeToPosition(-48, powerDriveHigh, sleepTime, tolerance);
             }else{
 
             }
@@ -1304,10 +1307,10 @@ public class FTC11109Code extends LinearOpMode {
 
         } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                strafeToPosition(-24, 0.3, sleepTime, tolerance);
+                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
 
             }else{
-                strafeToPosition(24, 0.3, sleepTime, tolerance);
+                strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
             }
 
 
@@ -1315,18 +1318,75 @@ public class FTC11109Code extends LinearOpMode {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
 
             }else{
-                strafeToPosition(48, 0.3, sleepTime, tolerance);
+                strafeToPosition(48, powerDriveHigh, sleepTime, tolerance);
             }
         }
 
 
-        turn(0, .3, powerin2, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-        runToPosition(-1, 0.3, sleepTime, tolerance);
+        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        runToPosition(-1, powerDriveHigh, sleepTime, tolerance);
 
 
-        turn(0, 3, .1, 0.2, 4, 4);
+        turn(0, powerTurnHigh, .1, 0.2, 4, 4);
 
 
+    }
+
+
+
+    private void autoTest() {
+        while (opModeIsActive()) {
+            autoFieldOriented(.3,.1,90,0);
+        }
+    }
+
+
+
+    private void autoFieldOriented(double fwd, double strafe, int targetAngle, double rotate) {
+        double tempForward;
+        double denominator;
+
+
+        if (telemetryEnabled) {
+            telemetry.addData("fwd", fwd);
+            telemetry.addData("strafe", strafe);
+        }
+
+        if (fieldOrientated) {
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            double currentAngle = angles.firstAngle + angleOffset;
+            tempForward = fwd;
+            fwd = (strafe * -Math.sin(currentAngle / 180 * Math.PI) + tempForward * Math.cos(currentAngle / 180 * Math.PI));
+            strafe = -(1.35 * -(strafe * Math.cos(currentAngle / 180 * Math.PI) + tempForward * Math.sin(currentAngle / 180 * Math.PI)));
+
+            rotate = rotate + teleopTurnToAngle(targetAngle, currentAngle, 0.6, 0.2);
+
+        }
+
+        if (telemetryEnabled) {
+            telemetry.addData("field fwd", fwd);
+            telemetry.addData("field strafe", strafe);
+        }
+        driveLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        denominator = Math.max(Math.abs(fwd) + Math.abs(strafe) + Math.abs(rotate), 1.0);
+        if (telemetryEnabled) {
+            telemetry.addData("denominator", denominator);
+        }
+
+        driveLF.setPower(adjustForVoltage((fwd + strafe + rotate) / denominator));
+        driveLB.setPower(adjustForVoltage(((fwd - strafe) + rotate) / denominator));
+        driveRF.setPower(adjustForVoltage(((fwd - strafe) - rotate) / denominator));
+        driveRB.setPower(adjustForVoltage(((fwd + strafe) - rotate) / denominator));
+        if (telemetryEnabled) {
+            telemetry.addData("left_driveF", (fwd + strafe + rotate) / denominator);
+            telemetry.addData("left_driveB", ((fwd - strafe) + rotate) / denominator);
+            telemetry.addData("right_driveF", ((fwd - strafe) - rotate) / denominator);
+            telemetry.addData("right_driveB", ((fwd + strafe) - rotate) / denominator);
+        }
     }
 
 
