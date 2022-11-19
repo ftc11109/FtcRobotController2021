@@ -65,11 +65,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -95,6 +97,11 @@ public class FTC11109Code extends LinearOpMode {
 
 
     // Declare OpMode members.
+    private DistanceSensor sensorDistances[];
+    final boolean useDistance = false;
+    final double furtherDistance = 48;
+    final double deliverDistance = 3;// TODO: Tune deliver distance
+
     private final ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private DcMotor driveLF = null;
     private DcMotor driveLB = null;
@@ -291,6 +298,16 @@ public class FTC11109Code extends LinearOpMode {
 
         motorIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        // sensorz
+        if (useDistance) {
+            sensorDistances = new DistanceSensor[]{
+                    hardwareMap.get(DistanceSensor.class, "distance0"),
+                    hardwareMap.get(DistanceSensor.class, "distance1"),
+                    hardwareMap.get(DistanceSensor.class, "distance2"),
+                    hardwareMap.get(DistanceSensor.class, "distance3"),
+                    hardwareMap.get(DistanceSensor.class, "distance4"),
+            };
+        }
 
 
         // Tell the driver that initialization is complete.
@@ -742,6 +759,22 @@ public class FTC11109Code extends LinearOpMode {
         telemetry.addData("isBusyRF", driveRF.isBusy());
         telemetry.addData("isBusyRB", driveRB.isBusy());
 
+    }
+
+    private void autoJunctionDeliver(){
+        double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
+        int lowestSensor = 0;
+        for (int i = 1; i < sensorDistances.length; i++){
+            double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
+            if (currentDistance < lowestDistance){
+                lowestDistance = currentDistance;
+                lowestSensor = i;
+            }
+        }
+        if (lowestDistance < furtherDistance) return;
+        if (lowestDistance < deliverDistance){
+
+        }
     }
 
     private void runToPosition(double targetInches, double power, int sleepTime, double tolerance) {
