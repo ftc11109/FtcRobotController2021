@@ -78,6 +78,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.Range;
 
+import android.graphics.Color;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -107,8 +109,8 @@ public class FTC11109Code extends LinearOpMode {
 
     NormalizedColorSensor sensorColorLeft;
     NormalizedColorSensor sensorColorRight;
-    final boolean useColor = false;
-    float gain = 50;
+    final boolean useColor = true;
+    float gain = 10;
     final float[] hsvValues = new float[3];
     final int saturationDivisor = 100; //what the difference in saturation is devided by to get you're strafe power
 
@@ -322,9 +324,10 @@ public class FTC11109Code extends LinearOpMode {
         }
 
         if (useColor) {
-     //     sensorColorLeft = hardwareMap.get(NormalizedColorSensor.class, "sensorColorLeft");
-//          sensorColorRight = hardwareMap.get(NormalizedColorSensor.class, "sensorColorRight");
-            //colorSensor.setGain(gain);
+            sensorColorLeft = hardwareMap.get(NormalizedColorSensor.class, "sensorColorLeft");
+            sensorColorRight = hardwareMap.get(NormalizedColorSensor.class, "sensorColorRight");
+            sensorColorLeft.setGain(gain);
+            sensorColorRight.setGain(gain);
 
 
         }
@@ -440,8 +443,8 @@ public class FTC11109Code extends LinearOpMode {
 //            motorArm.setTargetPosition(100);
 //            auto1();
 //            autoDeliverPark();
-//            autoTest();
-              autoDeliverPark2();
+            autoTest();
+              //autoDeliverPark2();
 
         }
     }
@@ -1392,8 +1395,19 @@ public class FTC11109Code extends LinearOpMode {
 
 
     private void autoTest() {
+
+        double turnTolerance = 0.2;
+        int failSafeCountThreshold = 4;
+        int targetReachedCountThreshold = 3;
+        double powerTurnHigh = .3;
+        double powerTurnLow = .17;
+
+        turn(90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+
+
         while (opModeIsActive()) {
-            autoFieldOriented(.3,.1,90,0);
+            autoFollowLine(.3, .1, 5);
+
         }
     }
 
@@ -1558,25 +1572,35 @@ public class FTC11109Code extends LinearOpMode {
 
 
 
-    private void autoFollowLine(double speedTowardsCone, speedSideways) {
-        float saturationLeft = getSaturation(sensorColorLeft)
-        float saturationRight = getSaturation(sensorColorRight)
+    private void autoFollowLine(double speedTowardsCone, double speedSideways, double targetInches) {
+        double targetTics = targetInches * COUNTS_PER_INCH;
 
+        float saturationLeft = getSaturation(sensorColorLeft);
+        float saturationRight = getSaturation(sensorColorRight);
 
+        driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        if (saturationLeft >= 0.6 && saturationRight >= 0.6) {
-            autoFieldOriented(0.0, speedTowardsCone, -90, 0);
+        while(driveLF.getCurrentPosition() < targetTics)
+            if (saturationLeft >= 0.6 && saturationRight >= 0.6) {
+                autoFieldOriented(0.0, -speedTowardsCone, 90, 0);
 
-        } else if (saturationLeft >= 0.6) {
-            autoFieldOriented(-speedSideways, speedTowardsCone, -90, 0);
+            } else if (saturationLeft >= 0.6) {
+                autoFieldOriented(-speedSideways, -speedTowardsCone, 90, 0);
 
-        } else if (saturationRight >= 0.6) {
-            autoFieldOriented(speedSideways, speedTowardsCone, -90, 0);
+            } else if (saturationRight >= 0.6) {
+                autoFieldOriented(speedSideways, -speedTowardsCone, 90, 0);
 
-        } else {
-            autoFieldOriented(0.0, speedTowardsCone, -90, 0);
+            } else {
+                autoFieldOriented(0.0, -speedTowardsCone, 90, 0);
 
         }
+
+
+
+
 
 
 //        if (saturationLeft > saturationRight) {
@@ -1592,7 +1616,7 @@ public class FTC11109Code extends LinearOpMode {
 
 
 
-         */
+
 
     }
 
@@ -1617,6 +1641,9 @@ public class FTC11109Code extends LinearOpMode {
         return hsvValues[1];
 
     }
+
+
+
 
 
 
