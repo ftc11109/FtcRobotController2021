@@ -66,6 +66,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -102,7 +103,19 @@ public class FTC11109Code extends LinearOpMode {
     final double furtherDistance = 48;
     final double deliverDistance = 3;// TODO: Tune deliver distance
 
-    private final ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+
+    NormalizedColorSensor sensorColorLeft;
+    NormalizedColorSensor sensorColorRight;
+    final boolean useColor = false;
+    float gain = 50;
+    final float[] hsvValues = new float[3];
+    final int saturationDivisor = 100; //what the difference in saturation is devided by to get you're strafe power
+
+
+
+
+   private final ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private DcMotor driveLF = null;
     private DcMotor driveLB = null;
     private DcMotor driveRF = null;
@@ -175,7 +188,6 @@ public class FTC11109Code extends LinearOpMode {
     final int slideTargetPickup = -1000;
 
     final boolean bothSlideMotors = true;
-
 
 
 
@@ -307,6 +319,14 @@ public class FTC11109Code extends LinearOpMode {
                     hardwareMap.get(DistanceSensor.class, "distance3"),
                     hardwareMap.get(DistanceSensor.class, "distance4"),
             };
+        }
+
+        if (useColor) {
+     //     sensorColorLeft = hardwareMap.get(NormalizedColorSensor.class, "sensorColorLeft");
+//          sensorColorRight = hardwareMap.get(NormalizedColorSensor.class, "sensorColorRight");
+            //colorSensor.setGain(gain);
+
+
         }
 
 
@@ -1532,6 +1552,73 @@ public class FTC11109Code extends LinearOpMode {
 
 
     }
+
+
+
+
+
+
+    private void autoFollowLine(double speedTowardsCone, speedSideways) {
+        float saturationLeft = getSaturation(sensorColorLeft)
+        float saturationRight = getSaturation(sensorColorRight)
+
+
+
+        if (saturationLeft >= 0.6 && saturationRight >= 0.6) {
+            autoFieldOriented(0.0, speedTowardsCone, -90, 0);
+
+        } else if (saturationLeft >= 0.6) {
+            autoFieldOriented(-speedSideways, speedTowardsCone, -90, 0);
+
+        } else if (saturationRight >= 0.6) {
+            autoFieldOriented(speedSideways, speedTowardsCone, -90, 0);
+
+        } else {
+            autoFieldOriented(0.0, speedTowardsCone, -90, 0);
+
+        }
+
+
+//        if (saturationLeft > saturationRight) {
+//            double strafePower = (saturationLeft - saturationRight) / saturationDivisor;
+//            autoFieldOriented(-strafePower, speedTowardsCone, -90, 0);
+//        }
+//
+//
+//        if (saturationLeft < saturationRight) {
+//            double strafePower = (saturationRight - saturationLeft) / saturationDivisor;
+//            autoFieldOriented(strafePower, speedTowardsCone, -90, 0);
+//        }
+
+
+
+         */
+
+    }
+
+
+    private float getSaturation(NormalizedColorSensor sensor) {
+        NormalizedRGBA colors = sensor.getNormalizedColors();
+        Color.colorToHSV(colors.toColor(), hsvValues);
+        if (telemetryEnabled) {
+            telemetry.addLine()
+                    .addData("Red", "%.3f", colors.red)
+                    .addData("Green", "%.3f", colors.green)
+                    .addData("Blue", "%.3f", colors.blue);
+            telemetry.addLine()
+                    .addData("Hue", "%.3f", hsvValues[0])
+                    .addData("Saturation", "%.3f", hsvValues[1])
+                    .addData("Value", "%.3f", hsvValues[2]);
+            telemetry.addData("Alpha", "%.3f", colors.alpha);
+
+
+        }
+
+        return hsvValues[1];
+
+    }
+
+
 
 }
 
