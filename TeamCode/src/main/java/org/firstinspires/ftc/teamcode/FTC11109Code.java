@@ -1241,9 +1241,9 @@ public class FTC11109Code extends LinearOpMode {
         int pickupTarget = (conesRemaining-1)*35+10;
             motorIntake.setPower(intakePowerPickup);
             if (bothSlideMotors) {
-                motorSlideL.setTargetPosition(slidePickupTarget);
+                motorSlideL.setTargetPosition(pickupTarget);
             }
-            motorSlideR.setTargetPosition(slidePickupTarget);
+            motorSlideR.setTargetPosition(pickupTarget);
 
             sleep(1000);
 
