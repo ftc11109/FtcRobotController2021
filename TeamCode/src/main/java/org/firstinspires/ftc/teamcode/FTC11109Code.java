@@ -169,6 +169,8 @@ public class FTC11109Code extends LinearOpMode {
     final int armDeliverHigh = 1720;
     final double getDistanceToJunctionHigh = 3.0;
 
+    int conesRemaining = 5;
+
     final int slideMax = 466;
     final int armMax = 2800;
 
@@ -1231,19 +1233,29 @@ public class FTC11109Code extends LinearOpMode {
             motorSlideR.setPower(slidePower);
         }
     }
+    //arm deliver high 1895
+    //slide deliver high 470
+    //arm high release 1935
 
     private void autoPickupCone() {
-        motorIntake.setPower(intakePowerPickup);
-        if (bothSlideMotors) {motorSlideL.setTargetPosition(slidePickupTarget);}
-        motorSlideR.setTargetPosition(slidePickupTarget);
+        int pickupTarget = (conesRemaining-1)*35+10;
+            motorIntake.setPower(intakePowerPickup);
+            if (bothSlideMotors) {
+                motorSlideL.setTargetPosition(slidePickupTarget);
+            }
+            motorSlideR.setTargetPosition(slidePickupTarget);
 
-        sleep(1000);
+            sleep(1000);
 
-        if (bothSlideMotors) {motorSlideL.setTargetPosition(slidePickupHigh);}
-        motorSlideR.setTargetPosition(slidePickupHigh);
-        motorIntake.setPower(intakePowerHold);
+            if (bothSlideMotors) {
+                motorSlideL.setTargetPosition(slidePickupHigh);
+            }
+            motorSlideR.setTargetPosition(slidePickupHigh);
+            motorIntake.setPower(intakePowerHold);
 
-        sleep(1000);
+            sleep(1000);
+
+        conesRemaining = conesRemaining - 1;
     }
 
     private void auto1() {
