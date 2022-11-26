@@ -1866,10 +1866,10 @@ public class FTC11109Code extends LinearOpMode {
         motorSlideL.setTargetPosition(slidePickupHigh);
         motorSlideR.setTargetPosition(slidePickupHigh);
 
-        if (Spot(RED, AUDIENCE)) runToPosition(5, powerDriveHigh, sleepTime, tolerance);
-        if (Spot(RED, JUDGE)) runToPosition(5, powerDriveHigh, sleepTime, tolerance);
-        if (Spot(BLUE, AUDIENCE)) runToPosition(5, powerDriveHigh, sleepTime, tolerance);
-        if (Spot(BLUE, JUDGE)) runToPosition(5, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(RED, AUDIENCE)) runToPosition(3, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(RED, JUDGE)) runToPosition(3, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(BLUE, AUDIENCE)) runToPosition(3, powerDriveHigh, sleepTime, tolerance);
+        if (Spot(BLUE, JUDGE)) runToPosition(3, powerDriveHigh, sleepTime, tolerance);
 
         strafeToPosition(12,powerDriveHigh,0,0.5);
 
