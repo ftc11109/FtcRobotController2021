@@ -808,7 +808,7 @@ public class FTC11109Code extends LinearOpMode {
     }
 
     private void autoJunctionDeliver(int junctionHeight){
-        int sleepTime = 500;
+        int sleepTime = 100;
 
         double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
         int lowestSensor = 0;
@@ -1824,7 +1824,7 @@ public class FTC11109Code extends LinearOpMode {
 
 
     private void autoDeliverPark4() {
-        int sleepTime = 500;
+        int sleepTime = 100;
         double tolerance = 0.2;
         double turnTolerance = 0.2;
         int failSafeCountThreshold = 4;
@@ -1833,13 +1833,13 @@ public class FTC11109Code extends LinearOpMode {
         double powerTurnLow = .17;
         double powerDriveHigh = .3;
         double powerDriveLow = .17;
-
-        runToPosition(39, powerDriveHigh, sleepTime, tolerance);
         motorArm.setTargetPosition(armDeliverMedium);
         motorSlideL.setTargetPosition(slideDeliverMedium);
         motorSlideR.setTargetPosition(slideDeliverMedium);
         motorIntake.setPower(intakePowerHold);
-        sleep(3000);
+        runToPosition(39, powerDriveHigh, sleepTime, tolerance);
+
+
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
             turn(90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
         } else {
