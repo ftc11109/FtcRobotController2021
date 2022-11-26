@@ -2011,15 +2011,16 @@ public class FTC11109Code extends LinearOpMode {
     private void autoFollowLine(double speedTowardsCone, double speedSideways, double lineCorrectionPower, double targetInches, DcMotor driveSide) {
         double targetTics = targetInches * COUNTS_PER_INCH;
 
-        float saturationLeft = getSaturation(sensorColorLeft);
-        float saturationRight = getSaturation(sensorColorRight);
-
         driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         while(driveSide.getCurrentPosition() < targetTics){
+
+            float saturationLeft = getSaturation(sensorColorLeft);
+            float saturationRight = getSaturation(sensorColorRight);
+
             if (saturationLeft >= 0.6 && saturationRight >= 0.6) {
                 autoFieldOriented(0.0, -speedTowardsCone, 90, 0);
 
