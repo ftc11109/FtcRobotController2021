@@ -198,6 +198,8 @@ public class FTC11109Code extends LinearOpMode {
     final boolean bothSlideMotors = true;
 
 
+    final double lineSaturation = 0.4;
+
 
 
     String startColor;
@@ -450,8 +452,8 @@ public class FTC11109Code extends LinearOpMode {
 //            motorArm.setTargetPosition(100);
 //            auto1();
 //            autoDeliverPark();
-//            autoTest();
-              autoDeliverPark4();
+              autoTest();
+              //autoDeliverPark4();
 
         }
     }
@@ -1546,20 +1548,7 @@ public class FTC11109Code extends LinearOpMode {
 
 
     private void autoTest() {
-
-        double turnTolerance = 0.2;
-        int failSafeCountThreshold = 4;
-        int targetReachedCountThreshold = 3;
-        double powerTurnHigh = .3;
-        double powerTurnLow = .17;
-
-        turn(90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-
-
-        while (opModeIsActive()) {
-            autoFollowLine(0.3,0,0.1,28,driveLF);
-
-        }
+        runToPositionLeftRightRamp(100, 100, 0, 1);
     }
 
 
@@ -1873,16 +1862,16 @@ public class FTC11109Code extends LinearOpMode {
 
         strafeToPosition(12,powerDriveHigh,0,0.5);
 
-        autoFollowLine(powerDriveHigh,0,0.1,28,driveLF);
+        autoFollowLine(powerDriveHigh,0,0.1,28, driveLF);
 
         while (opModeIsActive()) {
             autoPickupCone();
 
 
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                runToPositionLeftRight(-20, -34, .3, .3, sleepTime, tolerance);
+                runToPositionLeftRight(-20, -34, powerDriveHigh, powerDriveHigh, sleepTime, tolerance);
             } else{
-                runToPositionLeftRight(-34, -20, .3, .3, sleepTime, tolerance);
+                runToPositionLeftRight(-34, -20, powerDriveHigh, powerDriveHigh, sleepTime, tolerance);
             }
 
 
@@ -2018,13 +2007,13 @@ public class FTC11109Code extends LinearOpMode {
             float saturationLeft = getSaturation(sensorColorLeft, "Left saturation");
             float saturationRight = getSaturation(sensorColorRight, "Right saturation");
 
-            if (saturationLeft >= 0.6 && saturationRight >= 0.6) {
+            if (saturationLeft >= lineSaturation && saturationRight >= lineSaturation) {
                 autoFieldOriented(0.0, -speedTowardsCone, 90, 0);
 
-            } else if (saturationLeft >= 0.6) {
+            } else if (saturationLeft >= lineSaturation) {
                 autoFieldOriented(-lineCorrectionPower, -speedTowardsCone, 90, 0);
 
-            } else if (saturationRight >= 0.6) {
+            } else if (saturationRight >= lineSaturation) {
                 autoFieldOriented(lineCorrectionPower, -speedTowardsCone, 90, 0);
 
             } else {
@@ -2087,14 +2076,53 @@ public class FTC11109Code extends LinearOpMode {
         }
     }
 
+    private void runToPositionLeftRightRamp(double targetInchesL, double targetInchesR, int sleepTime, double tolerance) {
+        int targetPositionL = (int) (targetInchesL * COUNTS_PER_INCH);
+        int targetPositionR = (int) (targetInchesR * COUNTS_PER_INCH);
+        tolerance = tolerance * COUNTS_PER_INCH;
+
+        double minPower = 0.4;
+        double rampUpDistance = 200;
+        double rampDownDistance = 100;
+
+        double powerL = minPower;
+        double powerR = minPower;
+
+        ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
+        ((DcMotorEx) driveRB).setTargetPositionTolerance((int) tolerance);
+
+        initRunToPositionLeftRight(targetPositionL, targetPositionR, powerL, powerR, sleepTime);
+
+        while (opModeIsActive()) {
+            double positionL = driveLF.getCurrentPosition();
+            double positionR = driveRF.getCurrentPosition();
+
+            double powerLUp = (Math.abs(positionL) / rampUpDistance) * (1 - minPower) + minPower;
+            double powerRUp = (Math.abs(positionR) / rampUpDistance) * (1 - minPower) + minPower;
+
+            double powerLDown = (Math.abs(targetPositionL - positionL) / rampDownDistance) * (1 - minPower) + minPower;
+            double powerRDown = (Math.abs(targetPositionR - positionR) / rampDownDistance) * (1 - minPower) + minPower;
+
+            powerL = Math.min(Math.min(powerLUp, powerLDown), 1.0);
+            powerR = Math.min(Math.min(powerRUp, powerRDown), 1.0);
+
+
+            driveLF.setPower(powerL);
+            driveLB.setPower(powerL);
+            driveRF.setPower(powerR);
+            driveRB.setPower(powerR);
 
 
 
-    private void autoLoop(){
-
+            if (driveLF.isBusy() || driveLB.isBusy() || driveRF.isBusy() || driveRB.isBusy()) {
+                continue;
+            }
+            break;
+        }
+        sleep(sleepTime);
     }
-
-
 
 }
 
