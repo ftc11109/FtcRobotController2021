@@ -161,7 +161,7 @@ public class FTC11109Code extends LinearOpMode {
     final int slideDeliverLow = 315;
     final int armDeliverLow = 2750;
 
-    final int slideDeliverMedium = 190;
+    final int slideDeliverMedium = 230;
     final int armDeliverMedium = 1960;
     final double distanceToJunctionMedium = 5.0;
 
@@ -1982,7 +1982,19 @@ public class FTC11109Code extends LinearOpMode {
         driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        while(driveSide.getCurrentPosition() < targetTics){
+        while(true){
+
+            double currentPosition = driveSide.getCurrentPosition();
+
+            if (currentPosition > targetTics) {
+                break;
+            } else if (currentPosition > targetTics/3) {
+
+            }
+
+            if(telemetryEnabled) {
+                telemetry.addData("velocity", ((DcMotorEx) driveSide).getVelocity());
+            }
 
             float saturationLeft = getSaturation(sensorColorLeft, "Left saturation");
             float saturationRight = getSaturation(sensorColorRight, "Right saturation");
