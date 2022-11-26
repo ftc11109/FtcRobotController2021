@@ -161,7 +161,7 @@ public class FTC11109Code extends LinearOpMode {
     final int slideDeliverLow = 315;
     final int armDeliverLow = 2750;
 
-    final int slideDeliverMedium = 190;
+    final int slideDeliverMedium = 230;
     final int armDeliverMedium = 1960;
     final double distanceToJunctionMedium = 5.0;
 
@@ -1249,21 +1249,21 @@ public class FTC11109Code extends LinearOpMode {
 
     private void autoPickupCone() {
         int pickupTarget = (conesRemaining-1)*35+10;
-            motorIntake.setPower(intakePowerPickup);
-            if (bothSlideMotors) {
-                motorSlideL.setTargetPosition(pickupTarget);
-            }
-            motorSlideR.setTargetPosition(pickupTarget);
+        motorIntake.setPower(intakePowerPickup);
+        if (bothSlideMotors) {
+            motorSlideL.setTargetPosition(pickupTarget);
+        }
+        motorSlideR.setTargetPosition(pickupTarget);
 
-            sleep(1000);
+        sleep(1000);
 
-            if (bothSlideMotors) {
-                motorSlideL.setTargetPosition(slidePickupHigh);
-            }
-            motorSlideR.setTargetPosition(slidePickupHigh);
-            motorIntake.setPower(intakePowerHold);
+        if (bothSlideMotors) {
+            motorSlideL.setTargetPosition(slidePickupHigh);
+        }
+        motorSlideR.setTargetPosition(slidePickupHigh);
+        motorIntake.setPower(intakePowerHold);
 
-            sleep(1000);
+        sleep(1000);
 
         conesRemaining = conesRemaining - 1;
     }
@@ -1906,6 +1906,26 @@ public class FTC11109Code extends LinearOpMode {
                 autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,driveRF);
             }
         }
+//
+//        motorArm.setTargetPosition(0);
+//        motorSlideL.setTargetPosition(0);
+//        motorSlideR.setTargetPosition(0);
+//
+//        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+//            runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
+//        } else{
+//            runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
+//        }
+//
+//
+//        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+//            turn(90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+//        } else{
+//            turn(-90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+//        }
+//
+
+
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
             runToPositionLeftRight(0, 6, .3, .3, sleepTime, tolerance);
         } else{
@@ -1953,62 +1973,8 @@ public class FTC11109Code extends LinearOpMode {
         turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
         runToPosition(-1, powerDriveHigh, sleepTime, tolerance);
 
-//
-//        motorArm.setTargetPosition(0);
-//        motorSlideL.setTargetPosition(0);
-//        motorSlideR.setTargetPosition(0);
-//
-//        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-//            runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
-//        } else{
-//            runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
-//        }
-//
-//
-//        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-//            turn(90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-//        } else{
-//            turn(-90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-//        }
-//
 
-        // if we didn't detect a parking spot, pick a good default
-//        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
-//            parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER;
-//        }
-//
-//        // actually park!
-//        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
-//            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-//                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
-//            }else{
-//                strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
-//            }
-//
-//
-//        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
-//            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-//                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
-//
-//            }else{
-//                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
-//            }
-//
-//
-//        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
-//            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-//                strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
-//            }else{
-//                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
-//            }
-//        }
-//
-//
-//        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-//        runToPosition(-1, powerDriveHigh, sleepTime, tolerance);
-//
-//
-//        turn(0, powerTurnHigh, .1, 0.2, 4, 4);
+
 
 
     }
@@ -2026,10 +1992,26 @@ public class FTC11109Code extends LinearOpMode {
         driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        while(driveSide.getCurrentPosition() < targetTics){
+        while(true){
 
-            float saturationLeft = getSaturation(sensorColorLeft);
-            float saturationRight = getSaturation(sensorColorRight);
+            double currentPosition = driveSide.getCurrentPosition();
+            double currentVelocity = ((DcMotorEx) driveSide).getVelocity();
+
+            if(telemetryEnabled) {
+                telemetry.addData("velocity", currentVelocity);
+            }
+
+
+            if (currentPosition > targetTics) {
+                break;
+            } else if (currentPosition > targetTics/1.5 && currentVelocity < 300) {
+                break;
+            }
+
+
+
+            float saturationLeft = getSaturation(sensorColorLeft, "Left saturation");
+            float saturationRight = getSaturation(sensorColorRight, "Right saturation");
 
             if (saturationLeft >= 0.6 && saturationRight >= 0.6) {
                 autoFieldOriented(0.0, -speedTowardsCone, 90, 0);
@@ -2055,22 +2037,12 @@ public class FTC11109Code extends LinearOpMode {
     }
 
 
-    private float getSaturation(NormalizedColorSensor sensor) {
+    private float getSaturation(NormalizedColorSensor sensor, String telemetryLabel) {
         NormalizedRGBA colors = sensor.getNormalizedColors();
         Color.colorToHSV(colors.toColor(), hsvValues);
         if (telemetryEnabled) {
-            telemetry.addLine()
-                    .addData("Red", "%.3f", colors.red)
-                    .addData("Green", "%.3f", colors.green)
-                    .addData("Blue", "%.3f", colors.blue);
-            telemetry.addLine()
-                    .addData("Hue", "%.3f", hsvValues[0])
-                    .addData("Saturation", "%.3f", hsvValues[1])
-                    .addData("Value", "%.3f", hsvValues[2]);
-            telemetry.addData("Alpha", "%.3f", colors.alpha);
-
-
-        }
+            telemetry.addData(telemetryLabel, "%.3f", hsvValues[1]);
+            }
 
         return hsvValues[1];
 
