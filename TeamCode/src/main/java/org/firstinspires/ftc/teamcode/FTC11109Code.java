@@ -161,7 +161,7 @@ public class FTC11109Code extends LinearOpMode {
     final int slideDeliverLow = 315;
     final int armDeliverLow = 2750;
 
-    final int slideDeliverMedium = 230;
+    final int slideDeliverMedium = 210;
     final int armDeliverMedium = 1960;
     final double distanceToJunctionMedium = 5.0;
 
@@ -474,6 +474,11 @@ public class FTC11109Code extends LinearOpMode {
 
         gamepadDriveMotors();
         pickupAndDelivery();
+
+        if (telemetryEnabled) {
+            getSaturation(sensorColorLeft, "saturation left");
+            getSaturation(sensorColorRight, "saturation right");
+        }
 
         if (telemetryEnabled) {
             // updateDriverStation
@@ -1845,7 +1850,7 @@ public class FTC11109Code extends LinearOpMode {
         int targetReachedCountThreshold = 3;
         double powerTurnHigh = .3;
         double powerTurnLow = .17;
-        double powerDriveHigh = .3;
+        double powerDriveHigh = .4;
         double powerDriveLow = .17;
         motorArm.setTargetPosition(armDeliverMedium);
         motorSlideL.setTargetPosition(slideDeliverMedium);
