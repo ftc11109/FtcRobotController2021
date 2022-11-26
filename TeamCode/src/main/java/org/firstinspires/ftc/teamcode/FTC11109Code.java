@@ -450,8 +450,8 @@ public class FTC11109Code extends LinearOpMode {
 //            motorArm.setTargetPosition(100);
 //            auto1();
 //            autoDeliverPark();
-//            autoTest();
-              autoDeliverPark5();
+            autoTest();
+//              autoDeliverPark5();
 
         }
     }
