@@ -1562,7 +1562,7 @@ public class FTC11109Code extends LinearOpMode {
 
 
     private void autoTest() {
-        runToPositionLeftRightRamp(100, 100, 0, 1);
+        runToPositionLeftRightRamp(48, 48, 0, 1);
     }
 
 
@@ -2251,7 +2251,7 @@ public class FTC11109Code extends LinearOpMode {
 
         double minPower = 0.4;
         double rampUpDistance = 200;
-        double rampDownDistance = 100;
+        double rampDownDistance = 200;
 
         double powerL = minPower;
         double powerR = minPower;
