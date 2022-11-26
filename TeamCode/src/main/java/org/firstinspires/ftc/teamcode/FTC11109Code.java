@@ -1995,16 +1995,20 @@ public class FTC11109Code extends LinearOpMode {
         while(true){
 
             double currentPosition = driveSide.getCurrentPosition();
+            double currentVelocity = ((DcMotorEx) driveSide).getVelocity();
+
+            if(telemetryEnabled) {
+                telemetry.addData("velocity", currentVelocity);
+            }
+
 
             if (currentPosition > targetTics) {
                 break;
-            } else if (currentPosition > targetTics/3) {
-
+            } else if (currentPosition > targetTics/1.5 && currentVelocity < 300) {
+                break;
             }
 
-            if(telemetryEnabled) {
-                telemetry.addData("velocity", ((DcMotorEx) driveSide).getVelocity());
-            }
+
 
             float saturationLeft = getSaturation(sensorColorLeft, "Left saturation");
             float saturationRight = getSaturation(sensorColorRight, "Right saturation");
