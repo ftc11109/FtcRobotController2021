@@ -518,6 +518,12 @@ public class FTC11109Code extends LinearOpMode {
             if (fieldOrientated) {
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
                 double currentAngle = angles.firstAngle + angleOffset;
+                if (telemetryEnabled) {
+                    telemetry.addData("Z angle", angles.firstAngle);
+                    telemetry.addData("Y angle", angles.secondAngle);
+                    telemetry.addData("X angle", angles.thirdAngle);
+                    telemetry.addData("angleOffset", angleOffset);
+                }
                 tempForward = fwd;
                 fwd = -(strafe * -Math.sin(currentAngle / 180 * Math.PI) + tempForward * Math.cos(currentAngle / 180 * Math.PI));
                 strafe = 1.35 * -(strafe * Math.cos(currentAngle / 180 * Math.PI) + tempForward * Math.sin(currentAngle / 180 * Math.PI));
@@ -634,6 +640,10 @@ public class FTC11109Code extends LinearOpMode {
         if (telemetryEnabled) {
             telemetry.addData("angleDifference", angleDifference);
             telemetry.addData("currentAngle", currentAngle);
+            telemetry.addData("Z angle", angles.firstAngle);
+            telemetry.addData("Y angle", angles.secondAngle);
+            telemetry.addData("X angle", angles.thirdAngle);
+            telemetry.addData("angleOffset", angleOffset);
         }
 
         double rotateOut;
