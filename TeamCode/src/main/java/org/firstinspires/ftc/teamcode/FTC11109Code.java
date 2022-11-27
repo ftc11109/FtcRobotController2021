@@ -1183,7 +1183,7 @@ public class FTC11109Code extends LinearOpMode {
         runToPositionLeftRightWithJunction(targetInchesL, targetInchesR, powerL, powerR, sleepTime, tolerance, 0 );
     }
     private void runToPositionLeftRightWithJunction(double targetInchesL, double targetInchesR, double powerL, double powerR, int sleepTime, double tolerance, int junctionHeight) {
-        boolean armSlideMoved = false;
+
         int targetPositionL = (int) (targetInchesL * COUNTS_PER_INCH);
         int targetPositionR = (int) (targetInchesR * COUNTS_PER_INCH);
         tolerance = tolerance * COUNTS_PER_INCH;
@@ -1192,6 +1192,7 @@ public class FTC11109Code extends LinearOpMode {
         ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveRB).setTargetPositionTolerance((int) tolerance);
         initRunToPositionLeftRight(targetPositionL, targetPositionR, powerL, powerR, sleepTime);
+        boolean armSlideMoved = false;
         long startMillis = System.currentTimeMillis();
 
         while (opModeIsActive()) {
@@ -1654,7 +1655,7 @@ public class FTC11109Code extends LinearOpMode {
 
 
     private void autoTest() {
-        runToPositionLeftRightRamp(48, 48, 0, 1);
+        runToPositionLeftRightRamp(48, 48, 0, 1,0);
     }
 
 
@@ -1721,14 +1722,14 @@ public class FTC11109Code extends LinearOpMode {
         motorSlideL.setTargetPosition(slideDeliverMedium);
         motorSlideR.setTargetPosition(slideDeliverMedium);
         motorIntake.setPower(intakePowerHold);
-        runToPositionLeftRightRamp(53,53, 0, .5);
+        runToPositionLeftRightRamp(53,53, 0, .5,0);
 
 
 
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-            runToPositionLeftRightRamp(-18,0,0,.5);
+            runToPositionLeftRightRamp(-18,0,0,.5,0);
         } else {
-            runToPositionLeftRightRamp(0,-18,0,.5);
+            runToPositionLeftRightRamp(0,-18,0,.5,0);
         }
 
         autoJunctionDeliverContinuous(4);
@@ -1761,9 +1762,9 @@ public class FTC11109Code extends LinearOpMode {
 
 
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                runToPositionLeftRightWithJunction(-20, -34, powerJunction, powerJunction, sleepTime, tolerance,4);
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
             } else{
-                runToPositionLeftRightWithJunction(-34, -20, powerJunction, powerJunction, sleepTime, tolerance,4);
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
             }
 
 
@@ -1771,7 +1772,7 @@ public class FTC11109Code extends LinearOpMode {
 //            motorSlideL.setTargetPosition(slideDeliverMedium);
 //            motorSlideR.setTargetPosition(slideDeliverMedium);
 
-            autoJunctionDeliver(4);
+            autoJunctionDeliverContinuous(4);
 
 
             if (conesRemaining == 3) {
@@ -1811,10 +1812,12 @@ public class FTC11109Code extends LinearOpMode {
 
 
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-            runToPositionLeftRightRamp(0, 6, sleepTime, tolerance);
+            runToPositionLeftRightRamp(10, 0, sleepTime, tolerance,0);
         } else{
-            runToPositionLeftRightRamp(6, 0, sleepTime, tolerance);
+            runToPositionLeftRightRamp(0, 10, sleepTime, tolerance,0);
         }
+
+        sleep(5000);
         turn(0,.3,.15,1,4,3);
 
 
@@ -1966,7 +1969,7 @@ public class FTC11109Code extends LinearOpMode {
         }
     }
 
-    private void runToPositionLeftRightRamp(double targetInchesL, double targetInchesR, int sleepTime, double tolerance) {
+    private void runToPositionLeftRightRamp(double targetInchesL, double targetInchesR, int sleepTime, double tolerance,int junctionHeight) {
         int targetPositionL = (int) (targetInchesL * COUNTS_PER_INCH);
         int targetPositionR = (int) (targetInchesR * COUNTS_PER_INCH);
         tolerance = tolerance * COUNTS_PER_INCH;
@@ -1984,8 +1987,20 @@ public class FTC11109Code extends LinearOpMode {
         ((DcMotorEx) driveRB).setTargetPositionTolerance((int) tolerance);
 
         initRunToPositionLeftRight(targetPositionL, targetPositionR, powerL, powerR, sleepTime);
+        boolean armSlideMoved = false;
+        long startMillis = System.currentTimeMillis();
 
         while (opModeIsActive()) {
+            long currentMillis = System.currentTimeMillis();
+            if ((currentMillis-startMillis) > 200 &&  junctionHeight > 0  && !armSlideMoved) {
+                motorArm.setTargetPosition(armDeliverMedium);
+                motorSlideL.setTargetPosition(slideDeliverMedium);
+                motorSlideR.setTargetPosition(slideDeliverMedium);
+                motorIntake.setPower(intakePowerHold);
+                armSlideMoved = true;
+            }
+
+
             double positionL = driveLF.getCurrentPosition();
             double positionR = driveRF.getCurrentPosition();
 
