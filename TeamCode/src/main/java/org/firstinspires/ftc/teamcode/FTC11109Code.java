@@ -1,4 +1,15 @@
 /* TODO disable telemetry, calibrate camera detection
+
+Second league:
+* rename teleopFollowsAuto to standaloneTeleop and only reset arm/slide encoders for standalone
+* imu: either a static global variable so it's shared and doesn't need re-initialization or a save/restore from file
+* teleop auto-deliver button.  driver right trigger
+* teleop pickup cone button.  driver left trigger?  start intake wheel, drop slide, then if after X milliseconds its velocity is less than a threshold, keep intake turning, slide up at max power, and when position is high enough switch intake to hold power?
+  * optional:  drop slide using power instead of run to position?  and raise it using power?  should be faster.   return slide to runToPosition mode when high enough?
+* auto: finish parking.  back up, turn to angle, strafe?  or back up and use autoDriveMotors?
+* auto: test all the spots.
+
+First league:
 * Required:
  * Auto: tune for new robot
  * New robot can park
@@ -9,13 +20,11 @@
 
 * High priority:
  * Teleop: One button to press to pick up cone.  Releasing button moves to slideDeliverMedium?
- * Auto: detect red line to center on cone stack.
 
 * Low Priority:
  * Teleop: Pressing button picks up cone, detects when it's picked up, then goes to slideDeliverMedium.
- * Auto: if camera init fails, pick best parking spot to start tele.
  * All: Split myStart and myLoop to AutoStart and TeleStart and TeleLoop.
- * All: use camera to detect junction left/right/centered and automatically center if needed.
+ * Teleop: save & restore IMU (and/or have a "reset heading" button?  check if static class variables carry over?)
 
 * Done:
  * Auto: park based on signal side
@@ -26,9 +35,11 @@
  * Auto: Write AutoDeliverCone() and use it.
  * Auto: Write and test Red Judge.
  * Auto: Write and test Blue Judge.
- * Teleop: save & restore IMU (and/or have a "reset heading" button?  check if static class variables carry over?)
  * All: Configure arm and slide positions for pickup and delivery.
- */
+ * Auto: detect red line to center on cone stack.
+ * Auto: if camera init fails, pick best parking spot to start tele.
+ * All: use camera to detect junction left/right/centered and automatically center if needed.
+*/
 
 
 /* Copyright (c) 2017 FIRST. All rights reserved.
