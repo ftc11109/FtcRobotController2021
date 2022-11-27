@@ -2029,6 +2029,113 @@ public class FTC11109Code extends LinearOpMode {
         sleep(sleepTime);
     }
 
+
+
+
+    private void teleopDeliverAssist(int junctionHeight){
+
+        if (true) {
+            double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
+            int lowestSensor = 0;
+            for (int i = 1; i < sensorDistances.length; i++){
+                double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
+                if (currentDistance < lowestDistance){
+                    lowestDistance = currentDistance;
+                    lowestSensor = i;
+                }
+            }
+            if(lowestSensor == 2){
+                // TODO break if taking too long
+                if (lowestDistance < (distanceToJunctionMedium + 0.4) && lowestDistance > (distanceToJunctionMedium - 0.4)) {
+                    driveMotors(0,0,0);
+                    break;
+                }
+            }
+            if (telemetryEnabled) {
+                telemetry.addData("lowestSensor", lowestSensor);
+                telemetry.addData("lowestDistance", lowestDistance);
+                telemetry.update();
+            }
+
+            // center robot
+
+            double sidePower = 0;
+            double forwardPower = 0;
+
+            if(lowestSensor == 0){
+                sidePower = -.15;
+
+            }
+            if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
+                sidePower = -.1;
+            }
+            if(lowestSensor == 2){
+                // TODO break if taking too long
+                sidePower = 0;
+
+            }
+            if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
+                sidePower = .1;
+            }
+            if(lowestSensor == 4){
+                sidePower = .15;
+            }
+            if (lowestDistance < distanceToJunctionMedium - .2){
+                forwardPower = .15;
+            }
+            if (lowestDistance > distanceToJunctionMedium + .2){
+                forwardPower = -.15;
+            }
+            driveMotors(forwardPower,sidePower,0);
+
+
+        }
+
+
+
+    }
+
+
+
+
+    private void teleopDeliverCone() {
+        //deliver cone
+
+        if (junctionHeight == 4) {
+            motorSlideL.setTargetPosition(slideDeliverMedium-50);
+            motorSlideR.setTargetPosition(slideDeliverMedium-50);
+            motorIntake.setPower(intakePowerDeliver);
+            sleep(500);
+//            motorSlideL.setTargetPosition(slideDeliverMedium);
+//            motorSlideR.setTargetPosition(slideDeliverMedium);
+            motorIntake.setPower(0);
+        }
+        if (junctionHeight == 5) {
+            motorSlideL.setTargetPosition(slideDeliverHigh-50);
+            motorSlideR.setTargetPosition(slideDeliverHigh-50);
+            motorIntake.setPower(intakePowerDeliver);
+            sleep(500);
+//            motorSlideL.setTargetPosition(slideDeliverHigh);
+//            motorSlideR.setTargetPosition(slideDeliverHigh);
+            motorIntake.setPower(0);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
