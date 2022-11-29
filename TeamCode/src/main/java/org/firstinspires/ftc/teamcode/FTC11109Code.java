@@ -1362,6 +1362,7 @@ public class FTC11109Code extends LinearOpMode {
 
         double intakePowerOld = intakePower;
 
+
         if (gamepad2.y) {
             setTargets(armDeliverHigh, slideDeliverHigh);
         } else if (gamepad2.b) {
@@ -1451,6 +1452,11 @@ public class FTC11109Code extends LinearOpMode {
 
         if (slideTarget != slideTargetOld) {
             setSlideTarget(slideTarget);
+        }
+
+        if (gamepad1.right_trigger > 0.5) {
+            setTargets(armPickupLow,slidePickupLow);
+            motorIntake.setPower(intakePower);
         }
 
         if (intakePower != intakePowerOld) {
@@ -1831,18 +1837,17 @@ public class FTC11109Code extends LinearOpMode {
 //            turn(-90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
 //        }
 //
-        if (telemetryEnabled) {
-            telemetry.addData("Angle", angleOffset);
-            telemetry.update();
-        }
 
-        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-            runToPositionLeftRightRamp(10, 0, sleepTime, tolerance,0);
-        } else{
-            runToPositionLeftRightRamp(0, 10, sleepTime, tolerance,0);
-        }
+//        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+//            runToPositionLeftRightRamp(10, 0, sleepTime, tolerance,0);
+//        } else{
+//            runToPositionLeftRightRamp(0, 10, sleepTime, tolerance,0);
+//        }
 
-        sleep(5000);
+        runToPositionLeftRightRamp(-8, -8, sleepTime, tolerance,0);
+
+        sleep(2000);
+
         turn(0,.3,.15,1,4,3);
 
 
