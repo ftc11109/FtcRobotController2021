@@ -162,6 +162,8 @@ public class FTC11109Code extends LinearOpMode {
     final int slidePickupLow = 137;
     final int armPickupLow = 5;
 
+    boolean assistingPickup = false;
+
     // TODO calibrate slidePickupHigh
     final int slidePickupHigh = 335;
     final int armPickupHigh = 5;
@@ -180,7 +182,7 @@ public class FTC11109Code extends LinearOpMode {
 
     final int slideDeliverHigh = 465;
     final int armDeliverHigh = 1895;
-    final double getDistanceToJunctionHigh = 3.0;
+    final double distanceToJunctionHigh = 3.0;
 
     int conesRemaining = 5;
 
@@ -835,101 +837,17 @@ public class FTC11109Code extends LinearOpMode {
 
     }
 
-    private void autoJunctionDeliverLoop(int junctionHeight){
-        int sleepTime = 500;
-        double power = .3;
-        double tolerance = .2;
-
-        while (opModeIsActive()){
-            double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
-            int lowestSensor = 0;
-            for (int i = 1; i < sensorDistances.length; i++){
-                double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
-                if (currentDistance < lowestDistance){
-                    lowestDistance = currentDistance;
-                    lowestSensor = i;
-                }
-            }
-            telemetry.addData("lowestSensor", lowestSensor);
-            telemetry.addData("lowestDistance", lowestDistance);
-            telemetry.update();
-
-
-            // center robot
-            //ToDo get how far to strafe correct
-
-            if(lowestSensor == 0){
-                strafeToPosition(-1.5, power, sleepTime, tolerance);
-            }
-            if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
-                strafeToPosition(-.75, power, sleepTime, tolerance);
-            }
-            if(lowestSensor == 2){
-                // TODO break if taking too long
-                if (lowestDistance < (distanceToJunctionMedium + 0.4) && lowestDistance > (distanceToJunctionMedium - 0.4)) {
-                    break;
-                }
-            }
-            if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
-                strafeToPosition(.75,power, sleepTime, tolerance);
-            }
-            if(lowestSensor == 4){
-                strafeToPosition(1.5, power, sleepTime, tolerance);
-            }
-
-            //move forward
-            lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
-            lowestSensor = 0;
-            for (int i = 1; i < sensorDistances.length; i++){
-                double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
-                if (currentDistance < lowestDistance){
-                    lowestDistance = currentDistance;
-                    lowestSensor = i;
-                }
-            }
-            telemetry.addData("lowestSensor", lowestSensor);
-            telemetry.addData("lowestDistance", lowestDistance);
-            telemetry.update();
-
-            if (junctionHeight == 4) {
-                runToPosition(-(lowestDistance-distanceToJunctionMedium),power,sleepTime,.1);
-
-            } else if (junctionHeight == 5){
-                runToPosition(-(lowestDistance-distanceToJunctionMedium),power,sleepTime,.1);
-
-            } else {
-                runToPosition(-(lowestDistance-distanceToJunctionMedium),power,sleepTime,.1);
-
-            }
-        }
-
-        //deliver cone
-
-        if (junctionHeight == 4) {
-            motorSlideL.setTargetPosition(slideDeliverMedium-50);
-            motorSlideR.setTargetPosition(slideDeliverMedium-50);
-            motorIntake.setPower(intakePowerDeliver);
-            sleep(500);
-//            motorSlideL.setTargetPosition(slideDeliverMedium);
-//            motorSlideR.setTargetPosition(slideDeliverMedium);
-            motorIntake.setPower(0);
-        }
-        if (junctionHeight == 5) {
-            motorSlideL.setTargetPosition(slideDeliverHigh-50);
-            motorSlideR.setTargetPosition(slideDeliverHigh-50);
-            motorIntake.setPower(intakePowerDeliver);
-            sleep(500);
-//            motorSlideL.setTargetPosition(slideDeliverHigh);
-//            motorSlideR.setTargetPosition(slideDeliverHigh);
-            motorIntake.setPower(0);
-        }
-
-    }
-
     private void autoJunctionDeliverContinuous(int junctionHeight){
         int sleepTime = 500;
         double power = .3;
         double tolerance = .2;
+        double desiredJunctionDistance = 0.0;
+
+        if (junctionHeight == 4){
+            desiredJunctionDistance = distanceToJunctionMedium;
+        } if (junctionHeight == 5){
+            desiredJunctionDistance = distanceToJunctionHigh;
+        }
 
         while (opModeIsActive()){
             double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
@@ -943,7 +861,7 @@ public class FTC11109Code extends LinearOpMode {
             }
             if(lowestSensor == 2){
                 // TODO break if taking too long
-                if (lowestDistance < (distanceToJunctionMedium + 0.4) && lowestDistance > (distanceToJunctionMedium - 0.4)) {
+                if (lowestDistance < (desiredJunctionDistance + 0.4) && lowestDistance > (desiredJunctionDistance - 0.4)) {
                     driveMotors(0,0,0);
                     break;
                 }
@@ -977,10 +895,10 @@ public class FTC11109Code extends LinearOpMode {
             if(lowestSensor == 4){
                 sidePower = .15;
             }
-            if (lowestDistance < distanceToJunctionMedium - .2){
+            if (lowestDistance < desiredJunctionDistance - .2){
                 forwardPower = .15;
             }
-            if (lowestDistance > distanceToJunctionMedium + .2){
+            if (lowestDistance > desiredJunctionDistance + .2){
                 forwardPower = -.15;
             }
             driveMotors(forwardPower,sidePower,0);
@@ -1010,154 +928,6 @@ public class FTC11109Code extends LinearOpMode {
         }
 
     }
-
-    private void autoJunctionDeliver(int junctionHeight){
-        int sleepTime = 500;
-        double power = .3;
-        double tolerance = .2;
-
-        sleep(100);
-
-        double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
-        int lowestSensor = 0;
-        for (int i = 1; i < sensorDistances.length; i++){
-            double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
-            if (currentDistance < lowestDistance){
-                lowestDistance = currentDistance;
-                lowestSensor = i;
-            }
-        }
-        // center robot
-        //ToDo get how far to strafe correct
-
-        if(lowestSensor == 0){
-            strafeToPosition(-2, power, sleepTime, tolerance);
-        }
-        if(lowestSensor == 1 && lowestDistance > minimumStrafeDistance){
-            strafeToPosition(-1, power, sleepTime, tolerance);
-        }
-        if(lowestSensor == 2){
-            // Already Centered
-        }
-        if(lowestSensor == 3 && lowestDistance > minimumStrafeDistance){
-            strafeToPosition(1,power, sleepTime, tolerance);
-        }
-        if(lowestSensor == 4){
-            strafeToPosition(2, power, sleepTime, tolerance);
-        }
-
-
-        //move forward
-
-        lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
-        lowestSensor = 0;
-        for (int i = 1; i < sensorDistances.length; i++){
-            double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
-            if (currentDistance < lowestDistance){
-                lowestDistance = currentDistance;
-                lowestSensor = i;
-            }
-        }
-        telemetry.addData("lowestSensor", lowestSensor);
-
-        if (junctionHeight == 4) {
-            runToPosition(-(lowestDistance-distanceToJunctionMedium),power,sleepTime,.1);
-
-        } else if (junctionHeight == 5){
-            runToPosition(-(lowestDistance-distanceToJunctionMedium),power,sleepTime,.1);
-
-        } else {
-            runToPosition(-(lowestDistance-3),power,sleepTime,.1);
-
-        }
-
-
-
-        //center robot
-        lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
-        lowestSensor = 0;
-        for (int i = 1; i < sensorDistances.length; i++){
-            double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
-            if (currentDistance < lowestDistance){
-                lowestDistance = currentDistance;
-                lowestSensor = i;
-            }
-        }
-        if(lowestSensor == 0){
-            strafeToPosition(-2,.3,sleepTime,.1);
-        }
-        if(lowestSensor == 1){
-            strafeToPosition(-1,.3,sleepTime,.1);
-        }
-        if(lowestSensor == 2){
-            strafeToPosition(0,.3,sleepTime,.1);
-        }
-        if(lowestSensor == 3){
-            strafeToPosition(1,.3,sleepTime,.1);
-        }
-        if(lowestSensor == 4){
-            strafeToPosition(2,.3,sleepTime,.1);
-
-        }
-
-
-        // change distance if innacurate
-
-
-        lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
-        lowestSensor = 0;
-        for (int i = 1; i < sensorDistances.length; i++){
-            double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
-            if (currentDistance < lowestDistance){
-                lowestDistance = currentDistance;
-                lowestSensor = i;
-            }
-        }
-        telemetry.addData("lowestSensor", lowestSensor);
-
-        if (lowestDistance > (distanceToJunctionMedium + 0.25) || lowestDistance < (distanceToJunctionMedium - 0.25)) {
-            if (junctionHeight == 4) {
-                runToPosition(-(lowestDistance - distanceToJunctionMedium), power, sleepTime, .1);
-            } else if (junctionHeight == 5) {
-                runToPosition(-(lowestDistance - distanceToJunctionMedium), power, sleepTime, .1);
-            } else {
-                runToPosition(-(lowestDistance - 3), power, sleepTime, .1);
-            }
-        }
-
-
-
-        //deliver cone
-
-        if (junctionHeight == 4) {
-            motorSlideL.setTargetPosition(slideDeliverMedium-50);
-            motorSlideR.setTargetPosition(slideDeliverMedium-50);
-            motorIntake.setPower(intakePowerDeliver);
-            sleep(500);
-//            motorSlideL.setTargetPosition(slideDeliverMedium);
-//            motorSlideR.setTargetPosition(slideDeliverMedium);
-            motorIntake.setPower(0);
-        }
-        if (junctionHeight == 5) {
-            motorSlideL.setTargetPosition(slideDeliverHigh-50);
-            motorSlideR.setTargetPosition(slideDeliverHigh-50);
-            motorIntake.setPower(intakePowerDeliver);
-            sleep(500);
-//            motorSlideL.setTargetPosition(slideDeliverHigh);
-//            motorSlideR.setTargetPosition(slideDeliverHigh);
-            motorIntake.setPower(0);
-        }
-
-
-
-
-
-        //if (lowestDistance < furtherDistance) return;
-        //if (lowestDistance < deliverDistance){
-
-        //}
-    }
-
 
     private void runToPosition(double targetInches, double power, int sleepTime, double tolerance) {
         int targetPosition = (int) (targetInches * COUNTS_PER_INCH);
@@ -1431,6 +1201,15 @@ public class FTC11109Code extends LinearOpMode {
             }
         }
 
+        if (gamepad1.left_trigger > 0.5) {
+            setTargets(armDeliverGround, slideDeliverGround);
+            intakePower = intakePowerPickup;
+            assistingPickup = true;
+        } else if (assistingPickup) {
+            setTargets(armPickupHigh,slidePickupHigh);
+            assistingPickup = false;
+            intakePower = intakePowerHold;
+        }
 
         if (slideTarget > slideMax) {
             slideTarget = slideMax;
@@ -1451,11 +1230,6 @@ public class FTC11109Code extends LinearOpMode {
 
         if (slideTarget != slideTargetOld) {
             setSlideTarget(slideTarget);
-        }
-
-        if (gamepad1.right_trigger > 0.5) {
-            setTargets(armPickupLow,slidePickupLow);
-            motorIntake.setPower(intakePower);
         }
 
         if (intakePower != intakePowerOld) {
