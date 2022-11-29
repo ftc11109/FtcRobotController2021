@@ -45,7 +45,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="FTC11109Teleop", group="Iterative Opmode")
+@TeleOp(name="FTC11109TeleopResetIMU", group="Iterative Opmode")
 //@Disabled
 public class FTC11109TeleopResetIMU extends FTC11109Code {
     @Override
