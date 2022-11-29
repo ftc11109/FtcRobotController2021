@@ -29,8 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -46,13 +46,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="FTC11109TeleopInitIMU", group="Iterative Opmode")
-// @Disabled
-public class FTC11109TeleopInitIMU extends FTC11109Code {
+@TeleOp(name="FTC11109Teleop", group="Iterative Opmode")
+@Disabled
+public class FTC11109TeleopInitMotors extends FTC11109Code {
     @Override
     public void runOpMode() {
         setTeleop(true);
-        setTeleopFollowsAuto(false);
+        setInitImu(true);
+        setInitMotors(true);
         super.runOpMode();
     }
 

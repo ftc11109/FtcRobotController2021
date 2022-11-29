@@ -141,7 +141,8 @@ public class FTC11109Code extends LinearOpMode {
     private DcMotor motorIntake = null;
 
     boolean teleop;
-    boolean teleopFollowsAuto;
+    boolean initImu;
+    boolean initMotors;
     boolean fieldOrientated;
     boolean parabolicDriving;
 
@@ -231,8 +232,12 @@ public class FTC11109Code extends LinearOpMode {
         teleop = newTeleop;
     }
 
-    public void setTeleopFollowsAuto(boolean newTeleopFollowsAuto) {
-        teleopFollowsAuto = newTeleopFollowsAuto;
+    public void setInitImu(boolean newInitImu) {
+        initImu = newInitImu;
+    }
+
+    public void setInitMotors(boolean newInitMotors) {
+        initMotors = newInitMotors;
     }
 
     @Override
@@ -304,7 +309,8 @@ public class FTC11109Code extends LinearOpMode {
         motorArm.setDirection(DcMotor.Direction.FORWARD);
         motorIntake.setDirection(DcMotor.Direction.REVERSE);
 
-        if (!teleopFollowsAuto) {
+
+        if (initMotors) {
             if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
             motorSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motorArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -374,9 +380,9 @@ public class FTC11109Code extends LinearOpMode {
         // Get absolute orientation
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        if (teleopFollowsAuto) {
-            Files files = new Files();
-            angleOffset = -files.readFileDouble("IMUOffset");
+        if (!initImu) {
+//            Files files = new Files();
+//            angleOffset = -files.readFileDouble("IMUOffset");
         }
 
         if (!teleop) {
