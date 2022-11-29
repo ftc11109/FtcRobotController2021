@@ -586,7 +586,10 @@ public class FTC11109Code extends LinearOpMode {
         // gamepad 1 joysticks and slow mode
         dpadFwd = 0.25;
         dpadStrafe = 0.25;
-        if (gamepad1.dpad_up) {
+
+        if (gamepad1.right_trigger > 0.5) {
+            teleopDeliverAssist();
+        } else if (gamepad1.dpad_up) {
             if (gamepad1.dpad_right) {
                 driveMotors(-(dpadFwd / 1.4), -(dpadStrafe / 1.4), gamepad1.right_stick_x / 3);
             } else if (gamepad1.dpad_left) {
@@ -1787,18 +1790,19 @@ public class FTC11109Code extends LinearOpMode {
 
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
                 autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,driveLF);
-            } else{
+            } else {
                 autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,driveRF);
             }
         }
-//
+
+
         motorArm.setTargetPosition(0);
         motorSlideL.setTargetPosition(0);
         motorSlideR.setTargetPosition(0);
-//
+
 //        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
 //            runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
-//        } else{
+//        } else {
 //            runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
 //        }
 //
@@ -1809,7 +1813,10 @@ public class FTC11109Code extends LinearOpMode {
 //            turn(-90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
 //        }
 //
-
+        if (telemetryEnabled) {
+            telemetry.addData("Angle", angleOffset);
+            telemetry.update();
+        }
 
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
             runToPositionLeftRightRamp(10, 0, sleepTime, tolerance,0);
@@ -2032,67 +2039,59 @@ public class FTC11109Code extends LinearOpMode {
 
 
 
-    private void teleopDeliverAssist(int junctionHeight){
-
-        if (true) {
-            double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
-            int lowestSensor = 0;
-            for (int i = 1; i < sensorDistances.length; i++){
-                double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
-                if (currentDistance < lowestDistance){
-                    lowestDistance = currentDistance;
-                    lowestSensor = i;
-                }
+    private void teleopDeliverAssist(){
+        double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
+        int lowestSensor = 0;
+        for (int i = 1; i < sensorDistances.length; i++){
+            double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
+            if (currentDistance < lowestDistance){
+                lowestDistance = currentDistance;
+                lowestSensor = i;
             }
-            if(lowestSensor == 2){
-                // TODO break if taking too long
-                if (lowestDistance < (distanceToJunctionMedium + 0.4) && lowestDistance > (distanceToJunctionMedium - 0.4)) {
-                    driveMotors(0,0,0);
-                    break;
-                }
+        }
+        if(lowestSensor == 2){
+            // TODO break if taking too long
+            if (lowestDistance < (distanceToJunctionMedium + 0.4) && lowestDistance > (distanceToJunctionMedium - 0.4)) {
+                driveMotors(0,0,0);
+                return;
             }
-            if (telemetryEnabled) {
-                telemetry.addData("lowestSensor", lowestSensor);
-                telemetry.addData("lowestDistance", lowestDistance);
-                telemetry.update();
-            }
-
-            // center robot
-
-            double sidePower = 0;
-            double forwardPower = 0;
-
-            if(lowestSensor == 0){
-                sidePower = -.15;
-
-            }
-            if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
-                sidePower = -.1;
-            }
-            if(lowestSensor == 2){
-                // TODO break if taking too long
-                sidePower = 0;
-
-            }
-            if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
-                sidePower = .1;
-            }
-            if(lowestSensor == 4){
-                sidePower = .15;
-            }
-            if (lowestDistance < distanceToJunctionMedium - .2){
-                forwardPower = .15;
-            }
-            if (lowestDistance > distanceToJunctionMedium + .2){
-                forwardPower = -.15;
-            }
-            driveMotors(forwardPower,sidePower,0);
-
-
+        }
+        if (telemetryEnabled) {
+            telemetry.addData("lowestSensor", lowestSensor);
+            telemetry.addData("lowestDistance", lowestDistance);
+            telemetry.update();
         }
 
+        // center robot
 
+        double sidePower = 0;
+        double forwardPower = 0;
 
+        if(lowestSensor == 0){
+            sidePower = -.15;
+
+        }
+        if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
+            sidePower = -.1;
+        }
+        if(lowestSensor == 2){
+            // TODO break if taking too long
+            sidePower = 0;
+
+        }
+        if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
+            sidePower = .1;
+        }
+        if(lowestSensor == 4){
+            sidePower = .15;
+        }
+        if (lowestDistance < distanceToJunctionMedium - .2){
+            forwardPower = .15;
+        }
+        if (lowestDistance > distanceToJunctionMedium + .2){
+            forwardPower = -.15;
+        }
+        driveMotors(forwardPower,sidePower,0);
     }
 
 
@@ -2101,24 +2100,25 @@ public class FTC11109Code extends LinearOpMode {
     private void teleopDeliverCone() {
         //deliver cone
 
-        if (junctionHeight == 4) {
-            motorSlideL.setTargetPosition(slideDeliverMedium-50);
-            motorSlideR.setTargetPosition(slideDeliverMedium-50);
-            motorIntake.setPower(intakePowerDeliver);
-            sleep(500);
-//            motorSlideL.setTargetPosition(slideDeliverMedium);
-//            motorSlideR.setTargetPosition(slideDeliverMedium);
-            motorIntake.setPower(0);
-        }
-        if (junctionHeight == 5) {
-            motorSlideL.setTargetPosition(slideDeliverHigh-50);
-            motorSlideR.setTargetPosition(slideDeliverHigh-50);
-            motorIntake.setPower(intakePowerDeliver);
-            sleep(500);
-//            motorSlideL.setTargetPosition(slideDeliverHigh);
-//            motorSlideR.setTargetPosition(slideDeliverHigh);
-            motorIntake.setPower(0);
-        }
+//        if (junctionHeight == 4) {
+//            motorSlideL.setTargetPosition(slideDeliverMedium-50);
+//            motorSlideR.setTargetPosition(slideDeliverMedium-50);
+//            motorIntake.setPower(intakePowerDeliver);
+//            sleep(500);
+////            motorSlideL.setTargetPosition(slideDeliverMedium);
+////            motorSlideR.setTargetPosition(slideDeliverMedium);
+//            motorIntake.setPower(0);
+//        }
+//        if (junctionHeight == 5) {
+//            motorSlideL.setTargetPosition(slideDeliverHigh-50);
+//            motorSlideR.setTargetPosition(slideDeliverHigh-50);
+//            motorIntake.setPower(intakePowerDeliver);
+//            sleep(500);
+////            motorSlideL.setTargetPosition(slideDeliverHigh);
+////            motorSlideR.setTargetPosition(slideDeliverHigh);
+//            motorIntake.setPower(0);
+//        }
+
     }
 
 
