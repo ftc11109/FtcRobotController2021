@@ -11,6 +11,8 @@ Second league:
   * optional:  drop slide using power instead of run to position?  and raise it using power?  should be faster.   return slide to runToPosition mode when high enough?
 * auto: finish parking.  back up, turn to angle, strafe?  or back up and use autoDriveMotors?
 * auto: test all the spots.
+ *LOW integrate driveMotors and driveMotorsRobotOriented
+ * teleop: when right junction deliver position drop slide by 200
 
 First league:
 * Required:
@@ -28,6 +30,7 @@ First league:
  * Teleop: Pressing button picks up cone, detects when it's picked up, then goes to slideDeliverMedium.
  * All: Split myStart and myLoop to AutoStart and TeleStart and TeleLoop.
  * Teleop: save & restore IMU (and/or have a "reset heading" button?  check if static class variables carry over?)
+
 
 * Done:
  * Auto: park based on signal side
@@ -596,6 +599,37 @@ public class FTC11109Code extends LinearOpMode {
     }
 
 
+    private void driveMotorsRobotOriented(double fwd, double strafe, double rotate) {
+        double tempForward;
+        double denominator;
+
+
+        if (telemetryEnabled) {
+            telemetry.addData("fwd", fwd);
+            telemetry.addData("strafe", strafe);
+        }
+
+        driveLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        denominator = Math.max(Math.abs(fwd) + Math.abs(strafe) + Math.abs(rotate), 1.000001);
+        if (telemetryEnabled) {
+            telemetry.addData("denominator", denominator);
+        }
+        driveLF.setPower(adjustForVoltage((fwd + strafe + rotate) / denominator));
+        driveLB.setPower(adjustForVoltage(((fwd - strafe) + rotate) / denominator));
+        driveRF.setPower(adjustForVoltage(((fwd - strafe) - rotate) / denominator));
+        driveRB.setPower(adjustForVoltage(((fwd + strafe) - rotate) / denominator));
+        if (telemetryEnabled) {
+            telemetry.addData("left_driveF", (fwd + strafe + rotate) / denominator);
+            telemetry.addData("left_driveB", ((fwd - strafe) + rotate) / denominator);
+            telemetry.addData("right_driveF", ((fwd - strafe) - rotate) / denominator);
+            telemetry.addData("right_driveB", ((fwd + strafe) - rotate) / denominator);
+        }
+    }
+
+
     private void gamepadDriveMotors() {
         double fwdSign;
         double strafeSign;
@@ -609,7 +643,7 @@ public class FTC11109Code extends LinearOpMode {
         dpadFwd = 0.25;
         dpadStrafe = 0.25;
 
-        if (gamepad1.right_trigger > 0.5) {
+        if (gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5) {
             teleopDeliverAssist();
         } else if (gamepad1.dpad_up) {
             if (gamepad1.dpad_right) {
@@ -1206,7 +1240,7 @@ public class FTC11109Code extends LinearOpMode {
             }
         }
 
-        if (gamepad1.left_trigger > 0.5) {
+        if ((gamepad1.left_trigger > 0.5) || (gamepad2.left_trigger > 0.5)) {
             setTargets(armDeliverGround, slideDeliverGround);
             intakePower = intakePowerPickup;
             assistingPickup = true;
@@ -1855,7 +1889,10 @@ public class FTC11109Code extends LinearOpMode {
         if(lowestSensor == 2){
             // TODO break if taking too long
             if (lowestDistance < (distanceToJunctionMedium + 0.4) && lowestDistance > (distanceToJunctionMedium - 0.4)) {
-                driveMotors(0,0,0);
+                driveMotorsRobotOriented(0,0,0);
+                slideTarget = slideDeliverMedium-200;
+                motorSlideL.setTargetPosition(slideTarget);
+                motorSlideR.setTargetPosition(slideTarget);
                 return;
             }
         }
@@ -1894,7 +1931,7 @@ public class FTC11109Code extends LinearOpMode {
         if (lowestDistance > distanceToJunctionMedium + .2){
             forwardPower = -.15;
         }
-        driveMotors(forwardPower,sidePower,0);
+        driveMotorsRobotOriented(forwardPower,sidePower,0);
     }
 
 
