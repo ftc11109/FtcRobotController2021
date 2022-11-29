@@ -1,6 +1,9 @@
 /* TODO disable telemetry, calibrate camera detection
 
 Second league:
+* Fix RED JUDGE auto.  Looks like the followsline part needs to be position aware?
+* when picking up a cone in auto, check slide position is down instead of blind sleep.
+* when lifting up cone in auto, check slide position is high enough instead of blind sleep.
 * rename teleopFollowsAuto to standaloneTeleop and only reset arm/slide encoders for standalone
 * imu: either a static global variable so it's shared and doesn't need re-initialization or a save/restore from file
 * teleop auto-deliver button.  driver right trigger
@@ -165,6 +168,7 @@ public class FTC11109Code extends LinearOpMode {
     boolean assistingPickup = false;
 
     // TODO calibrate slidePickupHigh
+    final int slidePickupAfterPickup = 435;
     final int slidePickupHigh = 335;
     final int armPickupHigh = 5;
 
@@ -324,13 +328,11 @@ public class FTC11109Code extends LinearOpMode {
         motorArm.setPower(armPower);
         motorIntake.setPower(0);
 
-        ((DcMotorEx) motorSlideR).setTargetPositionTolerance(slideTolerance);
-
         if (bothSlideMotors) {
             ((DcMotorEx) motorSlideL).setTargetPositionTolerance(slideTolerance);
             motorSlideL.setTargetPosition(0);
         }
-
+        ((DcMotorEx) motorSlideR).setTargetPositionTolerance(slideTolerance);
         motorSlideR.setTargetPosition(0);
         motorArm.setTargetPosition(0);
         ((DcMotorEx) motorArm).setTargetPositionTolerance(armTolerance);
@@ -910,18 +912,19 @@ public class FTC11109Code extends LinearOpMode {
         //deliver cone
 
         if (junctionHeight == 4) {
-            motorSlideL.setTargetPosition(slideDeliverMedium-100);
-            motorSlideR.setTargetPosition(slideDeliverMedium-100);
-            sleep(1000);
+            motorSlideL.setTargetPosition(slideDeliverMedium-200);
+            motorSlideR.setTargetPosition(slideDeliverMedium-200);
+            sleep(500);
             motorIntake.setPower(intakePowerDeliver);
             sleep(500);
-//            motorSlideL.setTargetPosition(slideDeliverMedium);
-//            motorSlideR.setTargetPosition(slideDeliverMedium);
+            motorSlideL.setTargetPosition(slideDeliverMedium);
+            motorSlideR.setTargetPosition(slideDeliverMedium);
             motorIntake.setPower(0);
         }
         if (junctionHeight == 5) {
-            motorSlideL.setTargetPosition(slideDeliverHigh-50);
-            motorSlideR.setTargetPosition(slideDeliverHigh-50);
+            motorSlideL.setTargetPosition(slideDeliverHigh-100);
+            motorSlideR.setTargetPosition(slideDeliverHigh-100);
+            sleep(500);
             motorIntake.setPower(intakePowerDeliver);
             sleep(500);
 //            motorSlideL.setTargetPosition(slideDeliverHigh);
@@ -1208,7 +1211,7 @@ public class FTC11109Code extends LinearOpMode {
             intakePower = intakePowerPickup;
             assistingPickup = true;
         } else if (assistingPickup) {
-            setTargets(armPickupHigh,slidePickupHigh);
+            setTargets(armPickupHigh,slidePickupAfterPickup);
             assistingPickup = false;
             intakePower = intakePowerHold;
         }
@@ -1287,15 +1290,15 @@ public class FTC11109Code extends LinearOpMode {
 
 //        motorIntake.
 
-        sleep(1000);
+        sleep(800);
 
         if (bothSlideMotors) {
-            motorSlideL.setTargetPosition(slidePickupHigh);
+            motorSlideL.setTargetPosition(slidePickupAfterPickup);
         }
-        motorSlideR.setTargetPosition(slidePickupHigh);
+        motorSlideR.setTargetPosition(slidePickupAfterPickup);
         motorIntake.setPower(intakePowerHold);
 
-        sleep(300);
+        sleep(800);
 
         conesRemaining--;
     }
