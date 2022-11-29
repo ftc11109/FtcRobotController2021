@@ -51,7 +51,7 @@ public class FTC11109Teleop extends FTC11109Code {
     @Override
     public void runOpMode() {
         setTeleop(true);
-        setInitImu(true);
+        setInitImu(false);
         setInitMotors(false);
         super.runOpMode();
     }

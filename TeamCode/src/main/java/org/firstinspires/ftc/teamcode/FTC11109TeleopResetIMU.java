@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 /**
@@ -47,13 +46,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 
 @TeleOp(name="FTC11109Teleop", group="Iterative Opmode")
-@Disabled
-public class FTC11109TeleopInitMotors extends FTC11109Code {
+//@Disabled
+public class FTC11109TeleopResetIMU extends FTC11109Code {
     @Override
     public void runOpMode() {
         setTeleop(true);
         setInitImu(true);
-        setInitMotors(true);
+        setInitMotors(false);
         super.runOpMode();
     }
 
