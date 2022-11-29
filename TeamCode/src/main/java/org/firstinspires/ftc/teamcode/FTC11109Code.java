@@ -1618,7 +1618,7 @@ public class FTC11109Code extends LinearOpMode {
 //            runToPositionLeftRightRamp(0, 10, sleepTime, tolerance,0);
 //        }
 
-        runToPositionLeftRightRamp(-8, -8, sleepTime, tolerance,0);
+        runToPositionLeftRightRamp(8, 8, sleepTime, tolerance,0);
 
         sleep(2000);
 
