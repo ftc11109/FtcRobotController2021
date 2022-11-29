@@ -150,7 +150,7 @@ public class FTC11109Code extends LinearOpMode {
 
     Orientation angles;
     BNO055IMU.Parameters imuParameters;
-    private BNO055IMU imu;
+    static private BNO055IMU imu;
     double angleOffset = 0.0;
 
     final double headingOffset = 0.0;
@@ -365,27 +365,28 @@ public class FTC11109Code extends LinearOpMode {
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        if (initImu || imu == null) {
+            imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        // Create new IMU Parameters object.
-        imuParameters = new BNO055IMU.Parameters();
-        // Use degrees as angle unit.
-        imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        // Express acceleration as m/s^2.
-        imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        // Disable logging.
-        imuParameters.loggingEnabled = false;
+            // Create new IMU Parameters object.
+            imuParameters = new BNO055IMU.Parameters();
+            // Use degrees as angle unit.
+            imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            // Express acceleration as m/s^2.
+            imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            // Disable logging.
+            imuParameters.loggingEnabled = false;
 
-        imu.initialize(imuParameters);
-
+            imu.initialize(imuParameters);
+        }
 
         // Get absolute orientation
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        if (!initImu) {
+//        if (!initImu) {
 //            Files files = new Files();
 //            angleOffset = -files.readFileDouble("IMUOffset");
-        }
+//        }
 
         if (!teleop) {
 
@@ -513,11 +514,11 @@ public class FTC11109Code extends LinearOpMode {
      * Code to run ONCE after the driver hits STOP
      */
     public void myStop() {
-        if (!teleop) {
-            Files files = new Files();
-            double endAngle = getRawHeading();
-            files.saveFileDouble("IMUOffset", endAngle);
-        }
+//        if (!teleop) {
+//            Files files = new Files();
+//            double endAngle = getRawHeading();
+//            files.saveFileDouble("IMUOffset", endAngle);
+//        }
 
         driveLF.setPower(0);
         driveLB.setPower(0);
