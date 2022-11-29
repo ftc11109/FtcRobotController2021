@@ -910,8 +910,9 @@ public class FTC11109Code extends LinearOpMode {
         //deliver cone
 
         if (junctionHeight == 4) {
-            motorSlideL.setTargetPosition(slideDeliverMedium-50);
-            motorSlideR.setTargetPosition(slideDeliverMedium-50);
+            motorSlideL.setTargetPosition(slideDeliverMedium-100);
+            motorSlideR.setTargetPosition(slideDeliverMedium-100);
+            sleep(1000);
             motorIntake.setPower(intakePowerDeliver);
             sleep(500);
 //            motorSlideL.setTargetPosition(slideDeliverMedium);
@@ -1283,6 +1284,8 @@ public class FTC11109Code extends LinearOpMode {
             motorSlideL.setTargetPosition(pickupTarget);
         }
         motorSlideR.setTargetPosition(pickupTarget);
+
+//        motorIntake.
 
         sleep(1000);
 
@@ -1917,20 +1920,6 @@ public class FTC11109Code extends LinearOpMode {
 //        }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
