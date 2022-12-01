@@ -1632,8 +1632,7 @@ public class FTC11109Code extends LinearOpMode {
                 autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
             }
         }
-
-
+        
         motorArm.setTargetPosition(0);
         motorSlideL.setTargetPosition(0);
         motorSlideR.setTargetPosition(0);
