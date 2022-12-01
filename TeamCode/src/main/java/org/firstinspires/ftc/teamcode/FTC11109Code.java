@@ -187,13 +187,13 @@ public class FTC11109Code extends LinearOpMode {
     final int armDeliverMedium = 1960;
     final double distanceToJunctionMedium = 4.0;
 
-    final int slideDeliverHigh = 465;
-    final int armDeliverHigh = 1895;
+    final int slideDeliverHigh = 475;
+    final int armDeliverHigh = 1775;
     final double distanceToJunctionHigh = 3.0;
 
     int conesRemaining = 5;
 
-    final int slideMax = 466;
+    final int slideMax = 480;
     final int armMax = 2800;
 
     final int slidePickupTarget = 5;
@@ -956,8 +956,8 @@ public class FTC11109Code extends LinearOpMode {
             motorIntake.setPower(0);
         }
         if (junctionHeight == 5) {
-            motorSlideL.setTargetPosition(slideDeliverHigh-100);
-            motorSlideR.setTargetPosition(slideDeliverHigh-100);
+            motorSlideL.setTargetPosition(slideDeliverHigh-200);
+            motorSlideR.setTargetPosition(slideDeliverHigh-200);
             sleep(500);
             motorIntake.setPower(intakePowerDeliver);
             sleep(500);
@@ -1581,9 +1581,9 @@ public class FTC11109Code extends LinearOpMode {
         motorSlideR.setTargetPosition(slidePickupHigh);
 
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,driveLF);
+            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
         } else{
-            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,driveRF);
+            autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
         }
 
 
@@ -1627,9 +1627,9 @@ public class FTC11109Code extends LinearOpMode {
 
 
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,driveLF);
+                autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
             } else {
-                autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,driveRF);
+                autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
             }
         }
 
@@ -1715,7 +1715,7 @@ public class FTC11109Code extends LinearOpMode {
 
 
 
-    private void autoFollowLine(double speedTowardsCone, double speedSideways, double lineCorrectionPower, double targetInches, DcMotor driveSide) {
+    private void autoFollowLine(double speedTowardsCone, double speedSideways, double lineCorrectionPower, double targetInches, int targetAngle, DcMotor driveSide) {
         double targetTics = targetInches * COUNTS_PER_INCH;
 
         driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -1745,16 +1745,17 @@ public class FTC11109Code extends LinearOpMode {
             float saturationRight = getSaturation(sensorColorRight, "Right saturation");
 
             if (saturationLeft >= lineSaturation && saturationRight >= lineSaturation) {
-                autoFieldOriented(0.0, -speedTowardsCone, 90, 0);
+
+                autoFieldOriented(0.0, -speedTowardsCone, targetAngle, 0);
 
             } else if (saturationLeft >= lineSaturation) {
-                autoFieldOriented(-lineCorrectionPower, -speedTowardsCone, 90, 0);
+                autoFieldOriented(-lineCorrectionPower, -speedTowardsCone, targetAngle, 0);
 
             } else if (saturationRight >= lineSaturation) {
-                autoFieldOriented(lineCorrectionPower, -speedTowardsCone, 90, 0);
+                autoFieldOriented(lineCorrectionPower, -speedTowardsCone, targetAngle, 0);
 
             } else {
-                autoFieldOriented(speedSideways, -speedTowardsCone, 90, 0);
+                autoFieldOriented(speedSideways, -speedTowardsCone, targetAngle, 0);
             }
 
             if (telemetryEnabled) {
