@@ -185,7 +185,7 @@ public class FTC11109Code extends LinearOpMode {
 
     final int slideDeliverMedium = 210;
     final int armDeliverMedium = 1960;
-    final double distanceToJunctionMedium = 4.0;
+    final double distanceToJunctionMedium = 4.5;
 
     final int slideDeliverHigh = 475;
     final int armDeliverHigh = 1775;
@@ -284,7 +284,7 @@ public class FTC11109Code extends LinearOpMode {
         fieldOrientated = true;
         parabolicDriving = teleop;
 
-        telemetryEnabled = true;
+        telemetryEnabled = false;
 
         telemetry.addData("Status", "Initialized");
 
@@ -933,10 +933,10 @@ public class FTC11109Code extends LinearOpMode {
                 sidePower = .15;
             }
             if (lowestDistance < desiredJunctionDistance - .2){
-                forwardPower = .15;
+                forwardPower = .1;
             }
             if (lowestDistance > desiredJunctionDistance + .2){
-                forwardPower = -.15;
+                forwardPower = -.1;
             }
             driveMotors(forwardPower,sidePower,0);
 
@@ -1330,9 +1330,9 @@ public class FTC11109Code extends LinearOpMode {
             motorSlideL.setTargetPosition(slidePickupAfterPickup);
         }
         motorSlideR.setTargetPosition(slidePickupAfterPickup);
-        motorIntake.setPower(intakePowerHold);
 
         sleep(800);
+        motorIntake.setPower(intakePowerHold);
 
         conesRemaining--;
     }
@@ -1632,7 +1632,7 @@ public class FTC11109Code extends LinearOpMode {
                 autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
             }
         }
-        
+
         motorArm.setTargetPosition(0);
         motorSlideL.setTargetPosition(0);
         motorSlideR.setTargetPosition(0);
@@ -1659,9 +1659,10 @@ public class FTC11109Code extends LinearOpMode {
 
         runToPositionLeftRightRamp(8, 8, sleepTime, tolerance,0);
 
-        sleep(2000);
-
         turn(0,.3,.15,1,4,3);
+
+
+        sleep(30000);
 
 
         motorArm.setTargetPosition(0);
@@ -1678,7 +1679,7 @@ public class FTC11109Code extends LinearOpMode {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
                 strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
             }else{
-                strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
+                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
             }
 
 
@@ -1695,7 +1696,7 @@ public class FTC11109Code extends LinearOpMode {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
                 strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
             }else{
-                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
+                strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
             }
         }
 
