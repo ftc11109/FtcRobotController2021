@@ -1,6 +1,12 @@
 /* TODO disable telemetry, calibrate camera detection
 
 Second league:
+* Rewire colorsensorLeft
+* Add a sloped top to intake assembly so it doesn't catch wall
+* Back up 7" not 8"
+* After delivering a cone, robot sometimes hits low junction.  Either back up 2 inches then go to cone stack, or change angle to use more sidePower?
+* auto: after delivering last cone, do 1 of 3 autos: if cone stack, try to pick up another.  if middle, back up and turn.  if towards center, deliver to shared 5 high then angle to pick up from substation and move towards it.
+
 * Fix RED JUDGE auto.  Looks like the followsline part needs to be position aware?
 * when picking up a cone in auto, check slide position is down instead of blind sleep.
 * when lifting up cone in auto, check slide position is high enough instead of blind sleep.
