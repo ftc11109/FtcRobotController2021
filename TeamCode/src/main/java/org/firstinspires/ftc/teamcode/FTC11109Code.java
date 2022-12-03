@@ -2284,7 +2284,7 @@ public class FTC11109Code extends LinearOpMode {
     private void teleopDeliverAssist(){
         double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
         int lowestSensor = 0;
-        int slidePositon = slideDeliverMedium;
+        int slidePosition = slideDeliverMedium;
 
         double desiredJunctionDistance = 0.0;
 
@@ -2294,7 +2294,7 @@ public class FTC11109Code extends LinearOpMode {
 
         if (lastDeliver == 5){
             desiredJunctionDistance = distanceToJunctionHigh;
-            slidePositon = slideDeliverHigh;
+            slidePosition = slideDeliverHigh;
 
         }
 
@@ -2310,7 +2310,7 @@ public class FTC11109Code extends LinearOpMode {
             // TODO break if taking too long
             if (lowestDistance < (desiredJunctionDistance + 0.4) && lowestDistance > (desiredJunctionDistance - 0.4)) {
                 driveMotorsRobotOriented(0,0,0);
-                slideTarget = slidePositon-200;
+                slideTarget = slidePosition-200;
                 motorSlideL.setTargetPosition(slideTarget);
                 motorSlideR.setTargetPosition(slideTarget);
                 return;
