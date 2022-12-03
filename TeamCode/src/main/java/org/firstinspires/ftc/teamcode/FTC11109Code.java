@@ -927,13 +927,12 @@ public class FTC11109Code extends LinearOpMode {
             double sidePower = 0;
             double forwardPower = 0;
 
-            if (lowestDistance >= 40) {
-
+            if (lowestDistance >= 20) {
+                conesRemaining++;
+                return;
             }
-
             else if(lowestSensor == 0){
                 sidePower = -.15;
-
             }
             else if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
                 sidePower = -.1;
@@ -941,7 +940,6 @@ public class FTC11109Code extends LinearOpMode {
             else if(lowestSensor == 2){
                 // TODO break if taking too long
                 sidePower = 0;
-
             }
             else if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
                 sidePower = .1;
@@ -949,7 +947,9 @@ public class FTC11109Code extends LinearOpMode {
             else if(lowestSensor == 4){
                 sidePower = .15;
             }
-            else if (lowestDistance < desiredJunctionDistance - .2){
+
+            // forward correction
+            if (lowestDistance < desiredJunctionDistance - .2){
                 forwardPower = .1;
             }
             else if (lowestDistance > desiredJunctionDistance + .2){
@@ -2058,9 +2058,9 @@ public class FTC11109Code extends LinearOpMode {
 
         runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
 
-        turn(0,.3,.15,1,4,3);
+//        turn(0,.3,.15,1,4,3);
 
-        runToPositionLeftRightRamp(2,2,sleepTime,tolerance,0);
+//        runToPositionLeftRightRamp(2,2,sleepTime,tolerance,0);
 
 
         // actually park!
@@ -2069,26 +2069,32 @@ public class FTC11109Code extends LinearOpMode {
 
         if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
+                autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+                autoPickupCone();
             }else{
+                turn(0,.3,.15,1,4,3);
                 strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
             }
 
 
         } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                turn(0,.3,.15,1,4,3);
                 strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
 
             } else{
+                turn(0,.3,.15,1,4,3);
                 strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
             }
 
 
         } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                turn(0,.3,.15,1,4,3);
                 strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
             }else{
-                strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
+                autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+                autoPickupCone();
             }
         }
 
