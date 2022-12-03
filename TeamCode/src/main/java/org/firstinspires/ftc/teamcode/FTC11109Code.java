@@ -297,7 +297,7 @@ public class FTC11109Code extends LinearOpMode {
         fieldOrientated = true;
         parabolicDriving = teleop;
 
-        telemetryEnabled = false;
+        telemetryEnabled = true;
 
         telemetry.addData("Status", "Initialized");
 
@@ -490,7 +490,7 @@ public class FTC11109Code extends LinearOpMode {
 //            motorSlideR.setTargetPosition(150);
 //            motorArm.setTargetPosition(100);
 //            auto1();
-            autoDeliverPark();
+            autoDeliverPark3();
 //            autoTest();
 
         }
@@ -927,28 +927,32 @@ public class FTC11109Code extends LinearOpMode {
             double sidePower = 0;
             double forwardPower = 0;
 
-            if(lowestSensor == 0){
+            if (lowestDistance >= 40) {
+
+            }
+
+            else if(lowestSensor == 0){
                 sidePower = -.15;
 
             }
-            if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
+            else if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
                 sidePower = -.1;
             }
-            if(lowestSensor == 2){
+            else if(lowestSensor == 2){
                 // TODO break if taking too long
                 sidePower = 0;
 
             }
-            if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
+            else if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
                 sidePower = .1;
             }
-            if(lowestSensor == 4){
+            else if(lowestSensor == 4){
                 sidePower = .15;
             }
-            if (lowestDistance < desiredJunctionDistance - .2){
+            else if (lowestDistance < desiredJunctionDistance - .2){
                 forwardPower = .1;
             }
-            if (lowestDistance > desiredJunctionDistance + .2){
+            else if (lowestDistance > desiredJunctionDistance + .2){
                 forwardPower = -.1;
             }
             driveMotors(forwardPower,sidePower,0);
@@ -1871,12 +1875,12 @@ public class FTC11109Code extends LinearOpMode {
         motorSlideL.setTargetPosition(0);
         motorSlideR.setTargetPosition(0);
 
-        runToPositionLeftRightRamp(8, 8, sleepTime, tolerance,0);
+        runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
 
         turn(0,.3,.15,1,4,3);
 
 
-        sleep(5000);
+        sleep(sleepTime);
 
 
         motorArm.setTargetPosition(0);
@@ -1884,6 +1888,185 @@ public class FTC11109Code extends LinearOpMode {
         motorSlideR.setTargetPosition(0);
 
         // actually park!
+
+
+
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
+            }else{
+                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
+            }
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
+
+            } else{
+                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
+            }
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
+            }else{
+                strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
+            }
+        }
+
+
+        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        runToPosition(-1, powerDriveHigh, sleepTime, tolerance);
+
+
+
+
+
+    }
+
+
+    private void autoDeliverPark3() {
+        int sleepTime = 100;
+        double tolerance = 0.2;
+        double turnTolerance = 0.2;
+        int failSafeCountThreshold = 4;
+        int targetReachedCountThreshold = 3;
+        double powerJunction = .3;
+        double powerTurnHigh = .3;
+        double powerTurnLow = .17;
+        double powerDriveHigh = .4;
+        double powerDriveLow = .17;
+        motorArm.setTargetPosition(armDeliverMedium);
+        motorSlideL.setTargetPosition(slideDeliverMedium);
+        motorSlideR.setTargetPosition(slideDeliverMedium);
+        motorIntake.setPower(intakePowerHold);
+        runToPositionLeftRightRamp(53,53, 0, .5,0);
+
+
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            runToPositionLeftRightRamp(-18,0,0,.5,0);
+        } else {
+            runToPositionLeftRightRamp(0,-18,0,.5,0);
+        }
+
+        autoJunctionDeliverContinuous(4);
+
+
+        motorArm.setTargetPosition(armPickupHigh);
+        motorSlideL.setTargetPosition(slidePickupHigh);
+        motorSlideR.setTargetPosition(slidePickupHigh);
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+        } else{
+            autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+        }
+
+
+
+//        if (Spot(RED, AUDIENCE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+//        if (Spot(RED, JUDGE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+//        if (Spot(BLUE, AUDIENCE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+//        if (Spot(BLUE, JUDGE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+
+
+
+
+
+
+        while (opModeIsActive()) {
+            autoPickupCone();
+
+
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+
+//            motorArm.setTargetPosition(armDeliverMedium);
+//            motorSlideL.setTargetPosition(slideDeliverMedium);
+//            motorSlideR.setTargetPosition(slideDeliverMedium);
+
+            autoJunctionDeliverContinuous(4);
+
+
+            if (conesRemaining <= 4) {
+                break;
+            }
+
+            motorArm.setTargetPosition(armPickupHigh);
+            motorSlideL.setTargetPosition(slidePickupHigh);
+            motorSlideR.setTargetPosition(slidePickupHigh);
+
+
+
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+            } else {
+                autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+            }
+        }
+
+        motorArm.setTargetPosition(armPickupHigh);
+        motorSlideL.setTargetPosition(slidePickupHigh);
+        motorSlideR.setTargetPosition(slidePickupHigh);
+
+        // if we didn't detect a parking spot, pick a good default
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
+            parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER;
+        }
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+        } else {
+            autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+        }
+
+        autoPickupCone();
+
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+            autoJunctionDeliverContinuous(4);
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+            autoJunctionDeliverContinuous(4);
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+            autoJunctionDeliverContinuous(4);
+        }
+
+
+        motorArm.setTargetPosition(0);
+        motorSlideL.setTargetPosition(0);
+        motorSlideR.setTargetPosition(0);
+
+        runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
+
+        turn(0,.3,.15,1,4,3);
+
+        runToPositionLeftRightRamp(2,2,sleepTime,tolerance,0);
+
+
+        // actually park!
+
+
+
         if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
                 strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
@@ -2039,11 +2222,11 @@ public class FTC11109Code extends LinearOpMode {
         int curDeliverArm = 0;
 
         if (junctionHeight == 4){
-            curDeliverHeight = slideDeliverHigh;
+            curDeliverHeight = slideDeliverMedium;
             curDeliverArm = armDeliverMedium;
         } else if (junctionHeight == 5){
             curDeliverHeight = slideDeliverHigh;
-            curDeliverArm = armDeliverMedium;
+            curDeliverArm = armDeliverHigh;
         }
 
         ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
