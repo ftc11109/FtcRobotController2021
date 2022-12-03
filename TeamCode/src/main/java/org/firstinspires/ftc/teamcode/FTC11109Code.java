@@ -1,6 +1,7 @@
 /* TODO disable telemetry, calibrate camera detection
 
 Second league:
+* Fix deliver high when going to the left
 * Rewire colorsensorLeft
 * Add a sloped top to intake assembly so it doesn't catch wall
 * Back up 7" not 8"
@@ -12,9 +13,7 @@ Second league:
 * when lifting up cone in auto, check slide position is high enough instead of blind sleep.
 * rename teleopFollowsAuto to standaloneTeleop and only reset arm/slide encoders for standalone
 * imu: either a static global variable so it's shared and doesn't need re-initialization or a save/restore from file
-* teleop auto-deliver button.  driver right trigger
-* teleop pickup cone button.  driver left trigger?  start intake wheel, drop slide, then if after X milliseconds its velocity is less than a threshold, keep intake turning, slide up at max power, and when position is high enough switch intake to hold power?
-  * optional:  drop slide using power instead of run to position?  and raise it using power?  should be faster.   return slide to runToPosition mode when high enough?
+* optional:  drop slide using power instead of run to position?  and raise it using power?  should be faster.   return slide to runToPosition mode when high enough?
 * auto: finish parking.  back up, turn to angle, strafe?  or back up and use autoDriveMotors?
 * auto: test all the spots.
  *LOW integrate driveMotors and driveMotorsRobotOriented
@@ -27,10 +26,8 @@ First league:
   * Teleop: make sure slide and arm positions carry over (don't reset encoders?)
 
 
- * Auto: Write AutoPickupCone() and use it.
 
 * High priority:
- * Teleop: One button to press to pick up cone.  Releasing button moves to slideDeliverMedium?
 
 * Low Priority:
  * Teleop: Pressing button picks up cone, detects when it's picked up, then goes to slideDeliverMedium.
@@ -51,6 +48,10 @@ First league:
  * Auto: detect red line to center on cone stack.
  * Auto: if camera init fails, pick best parking spot to start tele.
  * All: use camera to detect junction left/right/centered and automatically center if needed.
+ * teleop auto-deliver button.  driver right trigger
+ * teleop pickup cone button.  driver left trigger?  start intake wheel, drop slide, then if after X milliseconds its velocity is less than a threshold, keep intake turning, slide up at max power, and when position is high enough switch intake to hold power?
+ * Auto: Write AutoPickupCone() and use it.
+ * Teleop: One button to press to pick up cone.  Releasing button moves to slideDeliverMedium?
 */
 
 
@@ -183,6 +184,8 @@ public class FTC11109Code extends LinearOpMode {
 
     final int slideDeliverGround = 0;
     final int armDeliverGround = 5;
+
+    int lastDeliver = 0;
 
     final int slidePowerOff = -50;
 
@@ -967,8 +970,8 @@ public class FTC11109Code extends LinearOpMode {
             sleep(500);
             motorIntake.setPower(intakePowerDeliver);
             sleep(500);
-//            motorSlideL.setTargetPosition(slideDeliverHigh);
-//            motorSlideR.setTargetPosition(slideDeliverHigh);
+            motorSlideL.setTargetPosition(slideDeliverHigh);
+            motorSlideR.setTargetPosition(slideDeliverHigh);
             motorIntake.setPower(0);
         }
 
@@ -1178,8 +1181,10 @@ public class FTC11109Code extends LinearOpMode {
 
 
         if (gamepad2.y) {
+            lastDeliver = 5;
             setTargets(armDeliverHigh, slideDeliverHigh);
         } else if (gamepad2.b) {
+            lastDeliver = 5;
             setTargets(armDeliverMedium, slideDeliverMedium);
         } else if (gamepad2.a) {
             setTargets(armDeliverLow, slideDeliverLow);
@@ -1554,6 +1559,185 @@ public class FTC11109Code extends LinearOpMode {
         }
     }
 
+    // not working for last cone
+    private void autoDeliverPark2() {
+        int sleepTime = 100;
+        double tolerance = 0.2;
+        double turnTolerance = 0.2;
+        int failSafeCountThreshold = 4;
+        int targetReachedCountThreshold = 3;
+        double powerJunction = .3;
+        double powerTurnHigh = .3;
+        double powerTurnLow = .17;
+        double powerDriveHigh = .4;
+        double powerDriveLow = .17;
+        motorArm.setTargetPosition(armDeliverMedium);
+        motorSlideL.setTargetPosition(slideDeliverMedium);
+        motorSlideR.setTargetPosition(slideDeliverMedium);
+        motorIntake.setPower(intakePowerHold);
+        runToPositionLeftRightRamp(53,53, 0, .5,0);
+
+
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            runToPositionLeftRightRamp(-18,0,0,.5,0);
+        } else {
+            runToPositionLeftRightRamp(0,-18,0,.5,0);
+        }
+
+        autoJunctionDeliverContinuous(4);
+
+
+        motorArm.setTargetPosition(armPickupHigh);
+        motorSlideL.setTargetPosition(slidePickupHigh);
+        motorSlideR.setTargetPosition(slidePickupHigh);
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+        } else{
+            autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+        }
+
+
+
+//        if (Spot(RED, AUDIENCE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+//        if (Spot(RED, JUDGE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+//        if (Spot(BLUE, AUDIENCE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+//        if (Spot(BLUE, JUDGE)) runToPosition(-5, powerDriveHigh, sleepTime, tolerance);
+
+
+
+
+
+
+        while (opModeIsActive()) {
+            autoPickupCone();
+
+
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+
+//            motorArm.setTargetPosition(armDeliverMedium);
+//            motorSlideL.setTargetPosition(slideDeliverMedium);
+//            motorSlideR.setTargetPosition(slideDeliverMedium);
+
+            autoJunctionDeliverContinuous(4);
+
+
+            if (conesRemaining <= 3) {
+                break;
+            }
+
+            motorArm.setTargetPosition(armPickupHigh);
+            motorSlideL.setTargetPosition(slidePickupHigh);
+            motorSlideR.setTargetPosition(slidePickupHigh);
+
+
+
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+            } else {
+                autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+            }
+        }
+
+        motorArm.setTargetPosition(armPickupHigh);
+        motorSlideL.setTargetPosition(slidePickupHigh);
+        motorSlideR.setTargetPosition(slidePickupHigh);
+
+        // if we didn't detect a parking spot, pick a good default
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
+            parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER;
+        }
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+        } else {
+            autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+        }
+
+        autoPickupCone();
+
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+            autoJunctionDeliverContinuous(4);
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+            autoJunctionDeliverContinuous(4);
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
+            // tries to deliver to the medium junction
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-44, -58, sleepTime, tolerance,5);
+            } else{
+                runToPositionLeftRightRamp(-58, -44, sleepTime, tolerance,5);
+            }
+            autoJunctionDeliverContinuous(5);
+        }
+
+
+        motorArm.setTargetPosition(0);
+        motorSlideL.setTargetPosition(0);
+        motorSlideR.setTargetPosition(0);
+
+        runToPositionLeftRightRamp(8, 8, sleepTime, tolerance,0);
+
+        turn(0,.3,.15,1,4,3);
+
+
+        sleep(5000);
+
+
+        motorArm.setTargetPosition(0);
+        motorSlideL.setTargetPosition(0);
+        motorSlideR.setTargetPosition(0);
+
+        // actually park!
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
+            }else{
+                strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
+            }
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
+
+            } else{
+                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
+            }
+
+
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
+            }else{
+                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
+            }
+        }
+
+
+        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+        runToPosition(-1, powerDriveHigh, sleepTime, tolerance);
+
+
+
+
+
+    }
+
     private void autoDeliverPark() {
         int sleepTime = 100;
         double tolerance = 0.2;
@@ -1614,7 +1798,6 @@ public class FTC11109Code extends LinearOpMode {
                 runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
             }
 
-
 //            motorArm.setTargetPosition(armDeliverMedium);
 //            motorSlideL.setTargetPosition(slideDeliverMedium);
 //            motorSlideR.setTargetPosition(slideDeliverMedium);
@@ -1622,7 +1805,7 @@ public class FTC11109Code extends LinearOpMode {
             autoJunctionDeliverContinuous(4);
 
 
-            if (conesRemaining == 3) {
+            if (conesRemaining <= 3) {
                 break;
             }
 
@@ -1639,46 +1822,62 @@ public class FTC11109Code extends LinearOpMode {
             }
         }
 
+        motorArm.setTargetPosition(armPickupHigh);
+        motorSlideL.setTargetPosition(slidePickupHigh);
+        motorSlideR.setTargetPosition(slidePickupHigh);
+
+        // if we didn't detect a parking spot, pick a good default
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
+            parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER;
+        }
+
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+        } else {
+            autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+        }
+
+        autoPickupCone();
+
+        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+            autoJunctionDeliverContinuous(4);
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+            autoJunctionDeliverContinuous(4);
+        } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(-20, -34, sleepTime, tolerance,4);
+            } else{
+                runToPositionLeftRightRamp(-34, -20, sleepTime, tolerance,4);
+            }
+            autoJunctionDeliverContinuous(4);
+        }
+
+
         motorArm.setTargetPosition(0);
         motorSlideL.setTargetPosition(0);
         motorSlideR.setTargetPosition(0);
-
-//        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-//            runToPositionLeftRight(0, 14, .3, .3, sleepTime, tolerance);
-//        } else {
-//            runToPositionLeftRight(14, 0, .3, .3, sleepTime, tolerance);
-//        }
-//
-//
-//        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-//            turn(90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-//        } else{
-//            turn(-90, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-//        }
-//
-
-//        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-//            runToPositionLeftRightRamp(10, 0, sleepTime, tolerance,0);
-//        } else{
-//            runToPositionLeftRightRamp(0, 10, sleepTime, tolerance,0);
-//        }
 
         runToPositionLeftRightRamp(8, 8, sleepTime, tolerance,0);
 
         turn(0,.3,.15,1,4,3);
 
 
-        sleep(30000);
+        sleep(5000);
 
 
         motorArm.setTargetPosition(0);
         motorSlideL.setTargetPosition(0);
         motorSlideR.setTargetPosition(0);
-
-        // if we didn't detect a parking spot, pick a good default
-        if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.DETECTING) {
-            parkingPosition = DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER;
-        }
 
         // actually park!
         if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
@@ -1832,6 +2031,17 @@ public class FTC11109Code extends LinearOpMode {
         double powerL = minPower;
         double powerR = minPower;
 
+        int curDeliverHeight = 0;
+        int curDeliverArm = 0;
+
+        if (junctionHeight == 4){
+            curDeliverHeight = slideDeliverHigh;
+            curDeliverArm = armDeliverMedium;
+        } else if (junctionHeight == 5){
+            curDeliverHeight = slideDeliverHigh;
+            curDeliverArm = armDeliverMedium;
+        }
+
         ((DcMotorEx) driveLF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveRF).setTargetPositionTolerance((int) tolerance);
         ((DcMotorEx) driveLB).setTargetPositionTolerance((int) tolerance);
@@ -1844,9 +2054,10 @@ public class FTC11109Code extends LinearOpMode {
         while (opModeIsActive()) {
             long currentMillis = System.currentTimeMillis();
             if ((currentMillis-startMillis) > 200 &&  junctionHeight > 0  && !armSlideMoved) {
-                motorArm.setTargetPosition(armDeliverMedium);
-                motorSlideL.setTargetPosition(slideDeliverMedium);
-                motorSlideR.setTargetPosition(slideDeliverMedium);
+
+                motorArm.setTargetPosition(curDeliverArm);
+                motorSlideL.setTargetPosition(curDeliverHeight);
+                motorSlideR.setTargetPosition(curDeliverHeight);
                 motorIntake.setPower(intakePowerHold);
                 armSlideMoved = true;
             }
@@ -1886,6 +2097,16 @@ public class FTC11109Code extends LinearOpMode {
     private void teleopDeliverAssist(){
         double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
         int lowestSensor = 0;
+
+        double desiredJunctionDistance = 0.0;
+
+        if (lastDeliver == 4){
+            desiredJunctionDistance = distanceToJunctionMedium;
+        }
+        if (lastDeliver == 5){
+            desiredJunctionDistance = distanceToJunctionHigh;
+        }
+
         for (int i = 1; i < sensorDistances.length; i++){
             double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
             if (currentDistance < lowestDistance){
@@ -1932,10 +2153,10 @@ public class FTC11109Code extends LinearOpMode {
         if(lowestSensor == 4){
             sidePower = .15;
         }
-        if (lowestDistance < distanceToJunctionMedium - .2){
+        if (lowestDistance < desiredJunctionDistance - .2){
             forwardPower = .15;
         }
-        if (lowestDistance > distanceToJunctionMedium + .2){
+        if (lowestDistance > desiredJunctionDistance + .2){
             forwardPower = -.15;
         }
         driveMotorsRobotOriented(forwardPower,sidePower,0);
