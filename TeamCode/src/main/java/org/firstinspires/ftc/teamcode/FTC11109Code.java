@@ -293,7 +293,7 @@ public class FTC11109Code extends LinearOpMode {
         fieldOrientated = true;
         parabolicDriving = teleop;
 
-        telemetryEnabled = false;
+        telemetryEnabled = true;
 
         telemetry.addData("Status", "Initialized");
 
@@ -923,28 +923,32 @@ public class FTC11109Code extends LinearOpMode {
             double sidePower = 0;
             double forwardPower = 0;
 
-            if(lowestSensor == 0){
+            if (lowestDistance >= 40) {
+
+            }
+
+            else if(lowestSensor == 0){
                 sidePower = -.15;
 
             }
-            if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
+            else if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
                 sidePower = -.1;
             }
-            if(lowestSensor == 2){
+            else if(lowestSensor == 2){
                 // TODO break if taking too long
                 sidePower = 0;
 
             }
-            if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
+            else if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
                 sidePower = .1;
             }
-            if(lowestSensor == 4){
+            else if(lowestSensor == 4){
                 sidePower = .15;
             }
-            if (lowestDistance < desiredJunctionDistance - .2){
+            else if (lowestDistance < desiredJunctionDistance - .2){
                 forwardPower = .1;
             }
-            if (lowestDistance > desiredJunctionDistance + .2){
+            else if (lowestDistance > desiredJunctionDistance + .2){
                 forwardPower = -.1;
             }
             driveMotors(forwardPower,sidePower,0);
