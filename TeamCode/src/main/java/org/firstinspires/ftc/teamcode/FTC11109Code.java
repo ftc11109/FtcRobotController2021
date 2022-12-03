@@ -200,6 +200,10 @@ public class FTC11109Code extends LinearOpMode {
     final int armDeliverHigh = 1775;
     final double distanceToJunctionHigh = 3.0;
 
+    final int assistMediumMin = 150;
+    final int assistMediumMax = 250;
+    final int assistHighMin = 400;
+
     int conesRemaining = 5;
 
     final int slideMax = 480;
@@ -1184,7 +1188,7 @@ public class FTC11109Code extends LinearOpMode {
             lastDeliver = 5;
             setTargets(armDeliverHigh, slideDeliverHigh);
         } else if (gamepad2.b) {
-            lastDeliver = 5;
+            lastDeliver = 4;
             setTargets(armDeliverMedium, slideDeliverMedium);
         } else if (gamepad2.a) {
             setTargets(armDeliverLow, slideDeliverLow);
@@ -2097,14 +2101,18 @@ public class FTC11109Code extends LinearOpMode {
     private void teleopDeliverAssist(){
         double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
         int lowestSensor = 0;
+        int slidePositon = slideDeliverMedium;
 
         double desiredJunctionDistance = 0.0;
 
         if (lastDeliver == 4){
             desiredJunctionDistance = distanceToJunctionMedium;
         }
+
         if (lastDeliver == 5){
             desiredJunctionDistance = distanceToJunctionHigh;
+            slidePositon = slideDeliverHigh;
+
         }
 
         for (int i = 1; i < sensorDistances.length; i++){
@@ -2114,16 +2122,18 @@ public class FTC11109Code extends LinearOpMode {
                 lowestSensor = i;
             }
         }
+
         if(lowestSensor == 2){
             // TODO break if taking too long
-            if (lowestDistance < (distanceToJunctionMedium + 0.4) && lowestDistance > (distanceToJunctionMedium - 0.4)) {
+            if (lowestDistance < (desiredJunctionDistance + 0.4) && lowestDistance > (desiredJunctionDistance - 0.4)) {
                 driveMotorsRobotOriented(0,0,0);
-                slideTarget = slideDeliverMedium-200;
+                slideTarget = slidePositon-200;
                 motorSlideL.setTargetPosition(slideTarget);
                 motorSlideR.setTargetPosition(slideTarget);
                 return;
             }
         }
+
         if (telemetryEnabled) {
             telemetry.addData("lowestSensor", lowestSensor);
             telemetry.addData("lowestDistance", lowestDistance);
