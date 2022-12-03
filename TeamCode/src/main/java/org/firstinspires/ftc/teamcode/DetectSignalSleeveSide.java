@@ -158,7 +158,7 @@ public class DetectSignalSleeveSide
         /*
          * The core values which define the location and size of the sample regions
          */
-        static final Point REGION_TOPLEFT_ANCHOR_POINT = new Point(120,98);
+        static final Point REGION_TOPLEFT_ANCHOR_POINT = new Point(140,98);
         static final int REGION_WIDTH = 60;
         static final int REGION_HEIGHT = 20;
 
