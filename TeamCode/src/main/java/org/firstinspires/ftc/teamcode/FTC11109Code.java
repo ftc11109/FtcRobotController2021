@@ -355,9 +355,9 @@ public class FTC11109Code extends LinearOpMode {
             motorSlideR.setTargetPosition(0);
             motorArm.setTargetPosition(0);
         } else {
-            motorArm.setTargetPosition(armPickupHigh);
-            motorSlideL.setTargetPosition(slidePickupHigh);
-            motorSlideR.setTargetPosition(slidePickupHigh);
+            motorArm.setTargetPosition(motorArm.getCurrentPosition());
+            motorSlideL.setTargetPosition(motorSlideL.getCurrentPosition());
+            motorSlideR.setTargetPosition(motorSlideR.getCurrentPosition());
         }
 
         if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);}
@@ -1730,29 +1730,22 @@ public class FTC11109Code extends LinearOpMode {
                 runToPositionLeftRightRamp(3, 3, 0, .5,0);
                 autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
                 autoPickupCone();
-            }else{
-                runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
-                turn(0,.3,.15,1,4,3);
+            }else {
+                runToPositionLeftRightRamp(6, 6, sleepTime, tolerance, 0);
+                turn(0, .3, .15, 1, 4, 3);
                 strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
                 turn(180, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                runToPositionLeftRightRamp(10,10, sleepTime, tolerance,0);
             }
 
 
         } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
                 runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
-                turn(0,.3,.15,1,4,3);
-                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
                 turn(180, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                runToPositionLeftRightRamp(10,10, sleepTime, tolerance,0);
 
             } else{
                 runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
-                turn(0,.3,.15,1,4,3);
-                strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
                 turn(180, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                runToPositionLeftRightRamp(10,10, sleepTime, tolerance,0);
             }
 
 
@@ -1762,7 +1755,6 @@ public class FTC11109Code extends LinearOpMode {
                 turn(0,.3,.15,1,4,3);
                 strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
                 turn(180, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-                runToPositionLeftRightRamp(10,10, sleepTime, tolerance,0);
 
             }else{
                 runToPositionLeftRightRamp(3, 3, sleepTime, tolerance,0);
