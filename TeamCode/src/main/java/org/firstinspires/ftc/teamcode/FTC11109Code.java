@@ -122,6 +122,8 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 // @Disabled
 public class FTC11109Code extends LinearOpMode {
 
+    final int armChange = 300;
+
 
     // Declare OpMode members.
     private DistanceSensor sensorDistances[];
@@ -974,11 +976,13 @@ public class FTC11109Code extends LinearOpMode {
         if (junctionHeight == 4) {
             motorSlideL.setTargetPosition(slideDeliverMedium-200);
             motorSlideR.setTargetPosition(slideDeliverMedium-200);
+            motorArm.setTargetPosition(armDeliverMedium+armChange);
             sleep(500);
             motorIntake.setPower(intakePowerDeliver);
             sleep(500);
             motorSlideL.setTargetPosition(slideDeliverMedium);
             motorSlideR.setTargetPosition(slideDeliverMedium);
+            motorArm.setTargetPosition(armDeliverMedium);
             motorIntake.setPower(0);
         }
         if (junctionHeight == 5) {
