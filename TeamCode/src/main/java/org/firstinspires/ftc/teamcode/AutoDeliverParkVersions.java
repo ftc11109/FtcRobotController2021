@@ -712,6 +712,32 @@ public class AutoDeliverParkVersions {
 
 
 
+//        if (initMotors) {
+//            if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
+//            motorSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            motorArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            motorIntake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        }
+//
+//        if (bothSlideMotors) {motorSlideL.setPower(slidePower);}
+//        motorSlideR.setPower(slidePower);
+//        motorArm.setPower(armPower);
+//        motorIntake.setPower(0);
+//
+//        if (bothSlideMotors) {
+//            ((DcMotorEx) motorSlideL).setTargetPositionTolerance(slideTolerance);
+//            motorSlideL.setTargetPosition(0);
+//        }
+//        ((DcMotorEx) motorSlideR).setTargetPositionTolerance(slideTolerance);
+//        motorSlideR.setTargetPosition(0);
+//        motorArm.setTargetPosition(0);
+//        ((DcMotorEx) motorArm).setTargetPositionTolerance(armTolerance);
+//
+//        if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);}
+//        motorSlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//        motorIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
  // not working for last cone
     private void autoDeliverPark7() {
