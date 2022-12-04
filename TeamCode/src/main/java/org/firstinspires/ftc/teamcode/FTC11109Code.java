@@ -1270,7 +1270,7 @@ public class FTC11109Code extends LinearOpMode {
         }
 
         if (gamepad2.left_trigger > 0.5) {
-            setTargets(armDeliverGround, slideDeliverGround);
+            setTargets(0, 0);
             intakePower = intakePowerPickup;
             assistingPickup = true;
         } else if (assistingPickup) {
