@@ -336,27 +336,27 @@ public class FTC11109Code extends LinearOpMode {
             if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
             motorSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motorArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motorIntake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-
-        if (bothSlideMotors) {motorSlideL.setPower(slidePower);}
-        motorSlideR.setPower(slidePower);
-        motorArm.setPower(armPower);
-        motorIntake.setPower(0);
-
-        if (bothSlideMotors) {
-            ((DcMotorEx) motorSlideL).setTargetPositionTolerance(slideTolerance);
             motorSlideL.setTargetPosition(0);
+            motorSlideR.setTargetPosition(0);
+            motorArm.setTargetPosition(0);
+
+            if (bothSlideMotors) {motorSlideL.setPower(slidePower);}
+            motorSlideR.setPower(slidePower);
+            motorArm.setPower(armPower);
+
+            if (bothSlideMotors) {
+                ((DcMotorEx) motorSlideL).setTargetPositionTolerance(slideTolerance);
+
+            }
+            ((DcMotorEx) motorSlideR).setTargetPositionTolerance(slideTolerance);
+            ((DcMotorEx) motorArm).setTargetPositionTolerance(armTolerance);
+
+            if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);}
+            motorSlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-        ((DcMotorEx) motorSlideR).setTargetPositionTolerance(slideTolerance);
-        motorSlideR.setTargetPosition(0);
-        motorArm.setTargetPosition(0);
-        ((DcMotorEx) motorArm).setTargetPositionTolerance(armTolerance);
 
-        if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);}
-        motorSlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+        motorIntake.setPower(0);
         motorIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // sensorz
@@ -892,6 +892,7 @@ public class FTC11109Code extends LinearOpMode {
         double power = .3;
         double tolerance = .2;
         double desiredJunctionDistance = 0.0;
+
 
         if (junctionHeight == 4){
             desiredJunctionDistance = distanceToJunctionMedium;
@@ -1589,12 +1590,13 @@ public class FTC11109Code extends LinearOpMode {
         runToPositionLeftRightRamp(53,53, 0, .5,0);
 
 
-
+        motorIntake.setPower(intakePowerPickup);
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
             runToPositionLeftRightRamp(-18,0,0,.5,0);
         } else {
             runToPositionLeftRightRamp(0,-18,0,.5,0);
         }
+        motorIntake.setPower(intakePowerHold);
 
         autoJunctionDeliverContinuous(4);
         runToPositionLeftRightRamp(3, 3, 0, .5,0);
@@ -1700,11 +1702,10 @@ public class FTC11109Code extends LinearOpMode {
         }
 
 
-        motorArm.setTargetPosition(0);
-        motorSlideL.setTargetPosition(0);
-        motorSlideR.setTargetPosition(0);
+        motorArm.setTargetPosition(armPickupHigh);
+        motorSlideL.setTargetPosition(slidePickupHigh);
+        motorSlideR.setTargetPosition(slidePickupHigh);
 
-        runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
 
 //        turn(0,.3,.15,1,4,3);
 
@@ -1717,38 +1718,52 @@ public class FTC11109Code extends LinearOpMode {
 
         if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(3, 3, 0, .5,0);
                 autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
                 autoPickupCone();
             }else{
+                runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
                 turn(0,.3,.15,1,4,3);
                 strafeToPosition(-24, powerDriveHigh, sleepTime, tolerance);
+                turn(180, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+                runToPositionLeftRightRamp(10,10, sleepTime, tolerance,0);
             }
 
 
         } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.CENTER) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
                 turn(0,.3,.15,1,4,3);
                 strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
+                turn(180, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+                runToPositionLeftRightRamp(10,10, sleepTime, tolerance,0);
 
             } else{
+                runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
                 turn(0,.3,.15,1,4,3);
                 strafeToPosition(0, powerDriveHigh, sleepTime, tolerance);
+                turn(180, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+                runToPositionLeftRightRamp(10,10, sleepTime, tolerance,0);
             }
 
 
         } else if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.RIGHT) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(6, 6, sleepTime, tolerance,0);
                 turn(0,.3,.15,1,4,3);
                 strafeToPosition(24, powerDriveHigh, sleepTime, tolerance);
+                turn(180, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
+                runToPositionLeftRightRamp(10,10, sleepTime, tolerance,0);
+
             }else{
+                runToPositionLeftRightRamp(3, 3, sleepTime, tolerance,0);
                 autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
                 autoPickupCone();
             }
         }
 
 
-        turn(0, powerTurnHigh, powerTurnLow, turnTolerance, targetReachedCountThreshold, failSafeCountThreshold);
-        runToPosition(-1, powerDriveHigh, sleepTime, tolerance);
+
 
 
 
