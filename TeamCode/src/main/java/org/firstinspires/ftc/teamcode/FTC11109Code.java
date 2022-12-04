@@ -1608,7 +1608,11 @@ public class FTC11109Code extends LinearOpMode {
         motorIntake.setPower(intakePowerHold);
 
         autoJunctionDeliverContinuous(4);
-        runToPositionLeftRightRamp(3, 3, 0, .5,0);
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            runToPositionLeftRightRamp(3, 3, 0, .5, 0);
+        } else {
+            runToPositionLeftRightRamp(6, 6, 0, .5, 0);
+        }
 
         motorArm.setTargetPosition(armPickupHigh);
         motorSlideL.setTargetPosition(slidePickupHigh);
@@ -1647,8 +1651,11 @@ public class FTC11109Code extends LinearOpMode {
 //            motorSlideR.setTargetPosition(slideDeliverMedium);
 
             autoJunctionDeliverContinuous(4);
-            runToPositionLeftRightRamp(3, 3, 0, .5,0);
-
+            if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+                runToPositionLeftRightRamp(3, 3, 0, .5, 0);
+            } else {
+                runToPositionLeftRightRamp(6, 6, 0, .5, 0);
+            }
 
 
             if (conesRemaining <= 4) {
