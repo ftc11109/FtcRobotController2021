@@ -1615,9 +1615,9 @@ public class FTC11109Code extends LinearOpMode {
         motorSlideR.setTargetPosition(slidePickupHigh);
 
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+            autoFollowLine(powerDriveHigh, powerDriveHigh * 1, 0.1, 34,90,driveLF);
         } else{
-            autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, -0.1, 34,-90,driveRF);
+            autoFollowLine(-powerDriveHigh, -powerDriveHigh * 1, -0.1, 34,-90,driveRF);
         }
 
 
@@ -1662,9 +1662,9 @@ public class FTC11109Code extends LinearOpMode {
 
 
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-                autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+                autoFollowLine(powerDriveHigh, powerDriveHigh * 1, 0.1, 34,90,driveLF);
             } else {
-                autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, -0.1, 34,-90,driveRF);
+                autoFollowLine(-powerDriveHigh, -powerDriveHigh * 1, -0.1, 34,-90,driveRF);
             }
         }
 
@@ -1678,9 +1678,9 @@ public class FTC11109Code extends LinearOpMode {
         }
 
         if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
-            autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+            autoFollowLine(powerDriveHigh, powerDriveHigh * 1, 0.1, 34,90,driveLF);
         } else {
-            autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, -0.1, 34,-90,driveRF);
+            autoFollowLine(-powerDriveHigh, -powerDriveHigh * 1, -0.1, 34,-90,driveRF);
         }
 
         autoPickupCone();
@@ -1728,7 +1728,7 @@ public class FTC11109Code extends LinearOpMode {
         if (parkingPosition == DetectSignalSleeveSide.PowerPlayDeterminationPipeline.ParkingPosition.LEFT) {
             if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
                 runToPositionLeftRightRamp(3, 3, 0, .5,0);
-                autoFollowLine(powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,90,driveLF);
+                autoFollowLine(powerDriveHigh, powerDriveHigh * 1, 0.1, 34,90,driveLF);
                 autoPickupCone();
             }else {
                 runToPositionLeftRightRamp(6, 6, sleepTime, tolerance, 0);
@@ -1758,7 +1758,7 @@ public class FTC11109Code extends LinearOpMode {
 
             }else{
                 runToPositionLeftRightRamp(3, 3, sleepTime, tolerance,0);
-                autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, -0.1, 34,-90,driveRF);
+                autoFollowLine(-powerDriveHigh, -powerDriveHigh * 1, -0.1, 34,-90,driveRF);
                 autoPickupCone();
             }
         }
