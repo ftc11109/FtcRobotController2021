@@ -333,28 +333,36 @@ public class FTC11109Code extends LinearOpMode {
 
 
         if (initMotors) {
-            if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
+            if (bothSlideMotors) {
+                motorSlideL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
             motorSlideR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motorArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+
+        if (bothSlideMotors) {motorSlideL.setPower(slidePower);}
+        motorSlideR.setPower(slidePower);
+        motorArm.setPower(armPower);
+
+        if (bothSlideMotors) {
+            ((DcMotorEx) motorSlideL).setTargetPositionTolerance(slideTolerance);
+        }
+        ((DcMotorEx) motorSlideR).setTargetPositionTolerance(slideTolerance);
+        ((DcMotorEx) motorArm).setTargetPositionTolerance(armTolerance);
+
+        if (initMotors) {
             motorSlideL.setTargetPosition(0);
             motorSlideR.setTargetPosition(0);
             motorArm.setTargetPosition(0);
-
-            if (bothSlideMotors) {motorSlideL.setPower(slidePower);}
-            motorSlideR.setPower(slidePower);
-            motorArm.setPower(armPower);
-
-            if (bothSlideMotors) {
-                ((DcMotorEx) motorSlideL).setTargetPositionTolerance(slideTolerance);
-
-            }
-            ((DcMotorEx) motorSlideR).setTargetPositionTolerance(slideTolerance);
-            ((DcMotorEx) motorArm).setTargetPositionTolerance(armTolerance);
-
-            if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);}
-            motorSlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } else {
+            motorArm.setTargetPosition(armPickupHigh);
+            motorSlideL.setTargetPosition(slidePickupHigh);
+            motorSlideR.setTargetPosition(slidePickupHigh);
         }
+
+        if (bothSlideMotors) {motorSlideL.setMode(DcMotor.RunMode.RUN_TO_POSITION);}
+        motorSlideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         motorIntake.setPower(0);
         motorIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -494,6 +502,7 @@ public class FTC11109Code extends LinearOpMode {
 //            autoTest();
 
         }
+
     }
 
     /*
@@ -656,7 +665,7 @@ public class FTC11109Code extends LinearOpMode {
         dpadFwd = 0.25;
         dpadStrafe = 0.25;
 
-        if (gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5) {
+        if (gamepad1.right_trigger > 0.5) {
             teleopDeliverAssist();
         } else if (gamepad1.dpad_up) {
             if (gamepad1.dpad_right) {
@@ -1260,7 +1269,7 @@ public class FTC11109Code extends LinearOpMode {
             }
         }
 
-        if ((gamepad1.left_trigger > 0.5) || (gamepad2.left_trigger > 0.5)) {
+        if (gamepad2.left_trigger > 0.5) {
             setTargets(armDeliverGround, slideDeliverGround);
             intakePower = intakePowerPickup;
             assistingPickup = true;
