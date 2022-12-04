@@ -52,7 +52,7 @@ public class FTC11109TeleopResetIMU extends FTC11109Code {
     public void runOpMode() {
         setTeleop(true);
         setInitImu(true);
-        setInitMotors(true);
+        setInitMotors(false);
         super.runOpMode();
     }
 

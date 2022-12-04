@@ -297,7 +297,7 @@ public class FTC11109Code extends LinearOpMode {
         fieldOrientated = true;
         parabolicDriving = teleop;
 
-        telemetryEnabled = true;
+        telemetryEnabled = false;
 
         telemetry.addData("Status", "Initialized");
 
@@ -937,11 +937,11 @@ public class FTC11109Code extends LinearOpMode {
             double sidePower = 0;
             double forwardPower = 0;
 
-            if (lowestDistance >= 20) {
-                conesRemaining++;
-                return;
-            }
-            else if(lowestSensor == 0){
+//            if (lowestDistance >= 20) {
+//                conesRemaining++;
+//                return;
+//            }
+            if(lowestSensor == 0){
                 sidePower = -.15;
             }
             else if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
