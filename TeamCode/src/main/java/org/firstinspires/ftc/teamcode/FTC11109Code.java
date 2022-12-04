@@ -1758,7 +1758,7 @@ public class FTC11109Code extends LinearOpMode {
 
             }else{
                 runToPositionLeftRightRamp(3, 3, sleepTime, tolerance,0);
-                autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, 0.1, 34,-90,driveRF);
+                autoFollowLine(-powerDriveHigh, powerDriveHigh * 0.3, -0.1, 34,-90,driveRF);
                 autoPickupCone();
             }
         }
