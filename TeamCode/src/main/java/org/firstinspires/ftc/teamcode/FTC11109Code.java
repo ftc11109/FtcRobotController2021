@@ -500,8 +500,8 @@ public class FTC11109Code extends LinearOpMode {
 //            motorSlideR.setTargetPosition(150);
 //            motorArm.setTargetPosition(100);
 //            auto1();
-            autoDeliverPark();
-//            autoTest();
+//            autoDeliverPark();
+            autoTest();
 
         }
 
@@ -904,6 +904,16 @@ public class FTC11109Code extends LinearOpMode {
         double tolerance = .2;
         double desiredJunctionDistance = 0.0;
 
+        if (junctionHeight == 4) {
+            motorSlideL.setTargetPosition(slideDeliverMedium-200);
+            motorSlideR.setTargetPosition(slideDeliverMedium-200);
+            sleep(500);
+        }
+        if (junctionHeight == 5) {
+            motorSlideL.setTargetPosition(slideDeliverHigh);
+            motorSlideR.setTargetPosition(slideDeliverHigh);
+            sleep(500);
+        }
 
         if (junctionHeight == 4){
             desiredJunctionDistance = distanceToJunctionMedium;
@@ -1529,7 +1539,22 @@ public class FTC11109Code extends LinearOpMode {
 
 
     private void autoTest() {
-        runToPositionLeftRightRamp(48, 48, 0, 1,0);
+        motorArm.setTargetPosition(armDeliverMedium);
+        motorSlideL.setTargetPosition(slideDeliverMedium);
+        motorSlideR.setTargetPosition(slideDeliverMedium);
+        motorIntake.setPower(intakePowerHold);
+        runToPositionLeftRightRamp(85,85, 0, .5,0);
+
+
+        motorIntake.setPower(intakePowerPickup);
+        if (Spot(RED,AUDIENCE) || Spot(BLUE,JUDGE)) {
+            runToPositionLeftRightRamp(-18,0,0,.5,0);
+        } else {
+            runToPositionLeftRightRamp(0,-18,0,.5,0);
+        }
+        motorIntake.setPower(intakePowerHold);
+
+        autoJunctionDeliverContinuous(5);
     }
 
 
@@ -1982,7 +2007,6 @@ public class FTC11109Code extends LinearOpMode {
         if (lastDeliver == 5){
             desiredJunctionDistance = distanceToJunctionHigh;
             slidePosition = slideDeliverHigh;
-
         }
 
         for (int i = 1; i < sensorDistances.length; i++){
