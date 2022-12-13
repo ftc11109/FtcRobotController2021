@@ -2091,6 +2091,34 @@ public class FTC11109Code extends LinearOpMode {
 //            motorIntake.setPower(0);
 //        }
 
+
+   //uncomment following 2 lines if using sample
+
+       // centerOnJunction(4);
+    }
+    //double desiredJunctionDistance = 0.0;
+
+    private void centerOnJunction(int junctionHeight){
+
+        double lowestDistance;
+        int lowestSensor = 0;
+
+        while (opModeIsActive()) {
+            //sensorDistances is an array with all 5 of our distance sensors
+            lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
+            lowestSensor = 0;
+
+            //goes through all of the sensors to get the lowest sensor and its distance
+            for (int i = 1; i < sensorDistances.length; i++) {
+                double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
+                if (currentDistance < lowestDistance) {
+                    lowestDistance = currentDistance;
+                    lowestSensor = i;
+                }
+            }
+        }
+
+        if (lowestSensor == 0){}
     }
 
 
