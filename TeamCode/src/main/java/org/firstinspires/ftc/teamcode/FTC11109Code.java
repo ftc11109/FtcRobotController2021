@@ -122,7 +122,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 // @Disabled
 public class FTC11109Code extends LinearOpMode {
 
-    final int armChange = 300;
+    final int armChange = 250;
 
 
     // Declare OpMode members.
@@ -185,7 +185,7 @@ public class FTC11109Code extends LinearOpMode {
     final int armPickupHigh = 5;
 
     final int slideDeliverGround = 0;
-    final int armDeliverGround = 5;
+    final int armDeliverGround = 0;
 
     int lastDeliver = 0;
 
@@ -227,7 +227,7 @@ public class FTC11109Code extends LinearOpMode {
     final int armTolerance = 10;
     final double armPower = 0.7;
     final int slideTolerance = 4;
-    final double slidePower = 0.5;
+    final double slidePower = 0.75;
 
 
     final int slideTargetPickup = -1000;
@@ -500,8 +500,8 @@ public class FTC11109Code extends LinearOpMode {
 //            motorSlideR.setTargetPosition(150);
 //            motorArm.setTargetPosition(100);
 //            auto1();
-//            autoDeliverPark();
-            autoTest();
+            autoDeliverPark();
+//            autoTest();
 
         }
 
@@ -668,7 +668,7 @@ public class FTC11109Code extends LinearOpMode {
         dpadStrafe = 0.25;
 
         if (gamepad1.right_trigger > 0.5) {
-            teleopDeliverAssist();
+            teleopDeliverAssist2();
         } else if (gamepad1.dpad_up) {
             if (gamepad1.dpad_right) {
                 driveMotors(-(dpadFwd / 1.4), -(dpadStrafe / 1.4), gamepad1.right_stick_x / 3);
@@ -898,22 +898,24 @@ public class FTC11109Code extends LinearOpMode {
 
     }
 
+    // Make sure you've moved the slide and arm to the appropriate positions before calling
+    // this method.
     private void autoJunctionDeliverContinuous(int junctionHeight){
         int sleepTime = 500;
         double power = .3;
         double tolerance = .2;
         double desiredJunctionDistance = 0.0;
 
-        if (junctionHeight == 4) {
-            motorSlideL.setTargetPosition(slideDeliverMedium-200);
-            motorSlideR.setTargetPosition(slideDeliverMedium-200);
-            sleep(500);
-        }
-        if (junctionHeight == 5) {
-            motorSlideL.setTargetPosition(slideDeliverHigh);
-            motorSlideR.setTargetPosition(slideDeliverHigh);
-            sleep(500);
-        }
+//        if (junctionHeight == 4) {
+//            motorSlideL.setTargetPosition(slideDeliverMedium);
+//            motorSlideR.setTargetPosition(slideDeliverMedium);
+//            sleep(500);
+//        }
+//        if (junctionHeight == 5) {
+//            motorSlideL.setTargetPosition(slideDeliverHigh);
+//            motorSlideR.setTargetPosition(slideDeliverHigh);
+//            sleep(500);
+//        }
 
         if (junctionHeight == 4){
             desiredJunctionDistance = distanceToJunctionMedium;
@@ -984,8 +986,8 @@ public class FTC11109Code extends LinearOpMode {
         //deliver cone
 
         if (junctionHeight == 4) {
-            motorSlideL.setTargetPosition(slideDeliverMedium-200);
-            motorSlideR.setTargetPosition(slideDeliverMedium-200);
+            motorSlideL.setTargetPosition(slideDeliverMedium-150);
+            motorSlideR.setTargetPosition(slideDeliverMedium-150);
             motorArm.setTargetPosition(armDeliverMedium+armChange);
             sleep(500);
             motorIntake.setPower(intakePowerDeliver);
@@ -1356,6 +1358,14 @@ public class FTC11109Code extends LinearOpMode {
     //arm deliver high 1895
     //slide deliver high 470
     //arm high release 1935
+
+
+    private void teleopAutoDeliverCone() {
+
+
+    }
+
+
 
     private void autoPickupCone() {
         int pickupTarget = (conesRemaining-1)*35+10;
@@ -1992,6 +2002,89 @@ public class FTC11109Code extends LinearOpMode {
 
 
 
+
+    private void teleopDeliverAssist2(){
+        double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
+        int lowestSensor = 0;
+
+        double desiredJunctionDistance = 0.0;
+
+        if (lastDeliver == 4){
+            desiredJunctionDistance = distanceToJunctionMedium;
+        }
+
+        if (lastDeliver == 5){
+            desiredJunctionDistance = distanceToJunctionHigh;
+        }
+
+        for (int i = 1; i < sensorDistances.length; i++){
+            double currentDistance = sensorDistances[i].getDistance(DistanceUnit.INCH);
+            if (currentDistance < lowestDistance){
+                lowestDistance = currentDistance;
+                lowestSensor = i;
+            }
+        }
+
+        if(lowestSensor == 2){
+            // TODO break if taking too long
+            if (lowestDistance < (desiredJunctionDistance + 0.4) && lowestDistance > (desiredJunctionDistance - 0.4)) {
+                driveMotorsRobotOriented(0,0,0);
+                if (lastDeliver == 5) {
+                    slideTarget = slideDeliverHigh - 0;
+                    armTarget = armDeliverHigh + 300;
+                    motorSlideL.setTargetPosition(slideTarget);
+                    motorSlideR.setTargetPosition(slideTarget);
+                    motorArm.setTargetPosition(armTarget);
+                    return;
+                }
+                else{
+                    slideTarget = slideDeliverMedium - 150;
+                    armTarget = armDeliverMedium + 200;
+                    motorSlideL.setTargetPosition(slideTarget);
+                    motorSlideR.setTargetPosition(slideTarget);
+                    motorArm.setTargetPosition(armTarget);
+                    return;
+                }
+            }
+        }
+
+        if (telemetryEnabled) {
+            telemetry.addData("lowestSensor", lowestSensor);
+            telemetry.addData("lowestDistance", lowestDistance);
+            telemetry.update();
+        }
+
+        // center robot
+
+        double sidePower = 0;
+        double forwardPower = 0;
+
+        if(lowestSensor == 0){
+            sidePower = -.15;
+
+        }
+        if(lowestSensor == 1){ //  && lowestDistance > minimumStrafeDistance
+            sidePower = -.1;
+        }
+        if(lowestSensor == 2){
+            // TODO break if taking too long
+            sidePower = 0;
+
+        }
+        if(lowestSensor == 3){ // && lowestDistance > minimumStrafeDistance
+            sidePower = .1;
+        }
+        if(lowestSensor == 4){
+            sidePower = .15;
+        }
+        if (lowestDistance < desiredJunctionDistance - .2){
+            forwardPower = .15;
+        }
+        if (lowestDistance > desiredJunctionDistance + .2){
+            forwardPower = -.15;
+        }
+        driveMotorsRobotOriented(forwardPower,sidePower,0);
+    }
 
     private void teleopDeliverAssist(){
         double lowestDistance = sensorDistances[0].getDistance(DistanceUnit.INCH);
