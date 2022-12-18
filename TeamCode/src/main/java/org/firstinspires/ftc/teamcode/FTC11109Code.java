@@ -181,7 +181,7 @@ public class FTC11109Code extends LinearOpMode {
 
     // TODO calibrate slidePickupHigh
     final int slidePickupAfterPickup = 435;
-    final int slidePickupHigh = 335;
+    final int slidePickupHigh = 315;
     final int armPickupHigh = 5;
 
     final int slideDeliverGround = 0;
@@ -229,7 +229,7 @@ public class FTC11109Code extends LinearOpMode {
     final int slideTolerance = 4;
     final double slidePower = 0.75;
 
-    
+
 
     final int slideTargetPickup = -1000;
 
