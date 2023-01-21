@@ -301,7 +301,7 @@ public class FTC11109Code extends LinearOpMode {
         fieldOrientated = true;
         parabolicDriving = teleop;
 
-        telemetryEnabled = false;
+        telemetryEnabled = true;
 
         telemetry.addData("Status", "Initialized");
 
@@ -2212,6 +2212,13 @@ public class FTC11109Code extends LinearOpMode {
         }
 
         if (lowestSensor == 0){}
+    }
+
+
+
+
+    private void correctForTilt() {
+
     }
 
 
