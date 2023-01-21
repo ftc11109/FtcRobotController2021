@@ -228,6 +228,7 @@ public class FTC11109Code extends LinearOpMode {
     final double armPower = 0.7;
     final int slideTolerance = 4;
     final double slidePower = 0.75;
+    final double slidePowerLow = 0.5;
 
 
 
@@ -1290,10 +1291,14 @@ public class FTC11109Code extends LinearOpMode {
             setTargets(0, 0);
             intakePower = intakePowerPickup;
             assistingPickup = true;
+            motorSlideL.setPower(slidePowerLow);
+            motorSlideR.setPower(slidePowerLow);
         } else if (assistingPickup) {
             setTargets(armPickupHigh,slidePickupAfterPickup);
             assistingPickup = false;
             intakePower = intakePowerHold;
+            motorSlideL.setPower(slidePower);
+            motorSlideR.setPower(slidePower);
         }
 
         if (slideTarget > slideMax) {
@@ -1348,13 +1353,7 @@ public class FTC11109Code extends LinearOpMode {
     private void setSlideTarget(int position) {
         if (bothSlideMotors) {motorSlideL.setTargetPosition(position);}
         motorSlideR.setTargetPosition(position);
-        if (position <= slidePowerOff) {
-            if (bothSlideMotors) {motorSlideL.setPower(0);}
-            motorSlideR.setPower(0);
-        }else {
-            if (bothSlideMotors) {motorSlideL.setPower(slidePower);}
-            motorSlideR.setPower(slidePower);
-        }
+
     }
     //arm deliver high 1895
     //slide deliver high 470
