@@ -1,4 +1,5 @@
 /* TODO disable telemetry, calibrate camera detection
+TODO fix correctForTilt (problem: always corrects in the same direction, angle is inconsistant)
 
 Second league:
 * Fix deliver high when going to the left
@@ -239,7 +240,9 @@ public class FTC11109Code extends LinearOpMode {
 
     final double lineSaturation = 0.4;
 
-
+    final static double tiltThreshold = 5.0; //when the robot will be considered tilted
+    static double flatAngle;
+    final static double tiltCorectionPower = 0.5;
 
     String startColor;
     String startAorJ;
@@ -431,6 +434,10 @@ public class FTC11109Code extends LinearOpMode {
         armTarget = 0;
 
 
+
+        flatAngle = -84.5; //(double) angles.secondAngle;
+
+
     }
 
     /*
@@ -526,6 +533,7 @@ public class FTC11109Code extends LinearOpMode {
         }
 
         gamepadDriveMotors();
+        //correctForTilt();
         pickupAndDelivery();
 
         if (telemetryEnabled) {
@@ -565,7 +573,6 @@ public class FTC11109Code extends LinearOpMode {
 
     private void driveMotors(double fwd, double strafe, double rotate) {
         double tempForward;
-        double denominator;
 
 
         if (telemetryEnabled) {
@@ -604,24 +611,7 @@ public class FTC11109Code extends LinearOpMode {
             telemetry.addData("field fwd", fwd);
             telemetry.addData("field strafe", strafe);
         }
-        driveLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        denominator = Math.max(Math.abs(fwd) + Math.abs(strafe) + Math.abs(rotate), 1.000001);
-        if (telemetryEnabled) {
-            telemetry.addData("denominator", denominator);
-        }
-        driveLF.setPower(adjustForVoltage((fwd + strafe + rotate) / denominator));
-        driveLB.setPower(adjustForVoltage(((fwd - strafe) + rotate) / denominator));
-        driveRF.setPower(adjustForVoltage(((fwd - strafe) - rotate) / denominator));
-        driveRB.setPower(adjustForVoltage(((fwd + strafe) - rotate) / denominator));
-        if (telemetryEnabled) {
-            telemetry.addData("left_driveF", (fwd + strafe + rotate) / denominator);
-            telemetry.addData("left_driveB", ((fwd - strafe) + rotate) / denominator);
-            telemetry.addData("right_driveF", ((fwd - strafe) - rotate) / denominator);
-            telemetry.addData("right_driveB", ((fwd + strafe) - rotate) / denominator);
-        }
+        rawDriveMotors(fwd, strafe, rotate);
     }
 
 
@@ -2218,7 +2208,66 @@ public class FTC11109Code extends LinearOpMode {
 
 
     private void correctForTilt() {
+        boolean tilting = false;
+        int direction = 0;
 
+        double currentAngleY = (double) angles.secondAngle;
+        if ((currentAngleY - flatAngle) > tiltThreshold) { //if we're tipping over the front
+            tilting = true;
+            direction = 1;
+
+        } else if ((currentAngleY - flatAngle) < -tiltThreshold) { //if we're tipping over the back
+            tilting = true;
+            direction = -1;
+
+        } else { //if we're not tipping
+            tilting = false;
+            direction = 0;
+
+        }
+
+        if(telemetryEnabled) {
+            telemetry.addData("tilting", tilting);
+            telemetry.addData("currentAngleY", currentAngleY);
+            telemetry.addData("flatAngle", flatAngle);
+            telemetry.addData("direction", direction);
+            telemetry.addData("tilt", (Math.abs(currentAngleY-flatAngle)));
+
+
+        }
+
+        if (tilting) {
+            rawDriveMotors(tiltCorectionPower * direction, 0, 0);
+            gamepad1.rumble(100);
+        } else {
+            gamepadDriveMotors();
+        }
+
+    }
+
+
+
+    private void rawDriveMotors(double fwd, double strafe, double rotate) {
+        double denominator;
+
+        driveLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        denominator = Math.max(Math.abs(fwd) + Math.abs(strafe) + Math.abs(rotate), 1.000001);
+        if (telemetryEnabled) {
+            telemetry.addData("denominator", denominator);
+        }
+        driveLF.setPower(adjustForVoltage((fwd + strafe + rotate) / denominator));
+        driveLB.setPower(adjustForVoltage(((fwd - strafe) + rotate) / denominator));
+        driveRF.setPower(adjustForVoltage(((fwd - strafe) - rotate) / denominator));
+        driveRB.setPower(adjustForVoltage(((fwd + strafe) - rotate) / denominator));
+        if (telemetryEnabled) {
+            telemetry.addData("left_driveF", (fwd + strafe + rotate) / denominator);
+            telemetry.addData("left_driveB", ((fwd - strafe) + rotate) / denominator);
+            telemetry.addData("right_driveF", ((fwd - strafe) - rotate) / denominator);
+            telemetry.addData("right_driveB", ((fwd + strafe) - rotate) / denominator);
+        }
     }
 
 
